@@ -11,39 +11,22 @@ from typing import TYPE_CHECKING
 from enum import Enum
 import numpy as np
 from napari_plugin_engine import napari_hook_implementation
+from magicgui import magicgui
+from itk import itkElastixRegistrationMethodPython
+import itk
 
 if TYPE_CHECKING:
     from napari.types import ImageData, LabelsData, LayerDataTuple
 
+@magicgui(call_button="register", transform = {"choices": ["rigid", "affine", "bspline"]})
+def register(fixed: 'napari.types.ImageData', moving:'napari.types.ImageData', transform: str) -> 'napari.types.LayerDataTuple':
+    parameter_object = parameterObject(transform)
+    result_image, result_transform_parameters = itk.elastix_registration_method(
+        fixed, moving,
+        parameter_object=parameter_object,
+        log_to_console=True)
+    return np.asarray(result_image).astype(np.float32), {'name':transform + ' Registration'}
 
-# This is the actual plugin function, where we export our function
-# (The functions themselves are defined below)
 @napari_hook_implementation
 def napari_experimental_provide_function():
-    # we can return a single function
-    # or a tuple of (function, magicgui_options)
-    # or a list of multiple functions with or without options, as shown here:
-    return [threshold, image_arithmetic]
-
-
-# 1.  First example, a simple function that thresholds an image and creates a labels layer
-def threshold(data: "ImageData", threshold: int) -> "LabelsData":
-    """Threshold an image and return a mask."""
-    return (data > threshold).astype(int)
-
-
-# 2. Second example, a function that adds, subtracts, multiplies, or divides two layers
-
-# using Enums is a good way to get a dropdown menu.  Used here to select from np functions
-class Operation(Enum):
-    add = np.add
-    subtract = np.subtract
-    multiply = np.multiply
-    divide = np.divide
-
-
-def image_arithmetic(
-    layerA: "ImageData", operation: Operation, layerB: "ImageData"
-) -> "LayerDataTuple":
-    """Adds, subtracts, multiplies, or divides two same-shaped image layers."""
-    return (operation.value(layerA, layerB), {"colormap": "turbo"})
+    return register

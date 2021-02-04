@@ -51,9 +51,5 @@ setup(
         'Operating System :: OS Independent',
         'License :: OSI Approved :: Apache Software License',
     ],
-    entry_points={
-        'napari.plugin': [
-            'elastix_napari = elastix_napari',
-        ],
-    },
+    entry_points={'napari.plugin': 'itk-elastix_napari = elastix_napari'},
 )
