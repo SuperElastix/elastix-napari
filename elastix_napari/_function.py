@@ -16,10 +16,10 @@ from itk import itkElastixRegistrationMethodPython
 import itk
 
 # if TYPE_CHECKING:
-from napari.types import ImageData, LabelsData, LayerDataTuple
+# from napari.types import ImageData, LabelsData, LayerDataTuple
 
 @magic_factory(call_button="register", transform = {"choices": ["rigid", "affine", "bspline"]})
-def register(fixed: ImageData, moving: ImageData, transform: str) -> LayerDataTuple:
+def register(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', transform: str) -> 'napari.types.LayerDataTuple':
     parameter_object = itk.ParameterObject.New()
     default_rigid_parameter_map = parameter_object.GetDefaultParameterMap(transform, 3)
     parameter_object.AddParameterMap(default_rigid_parameter_map)
