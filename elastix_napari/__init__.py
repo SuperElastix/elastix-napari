@@ -3,8 +3,7 @@ try:
 except ImportError:
     __version__ = "unknown"
 
+__author__ = "Viktor van der Valk"
+__email__ = "v.o.van_der_valk@lumc.nl"
 
-
-
-# from ._function import napari_experimental_provide_function
-from ._function import napari_experimental_provide_dock_widget
+from .elastix_registration import napari_experimental_provide_dock_widget

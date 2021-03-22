@@ -20,19 +20,18 @@ from typing import Sequence
 # from napari.types import ImageData, LabelsData, LayerDataTuple
 def on_init(widget):
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
+    # widget.label = 0
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                 transform = {"choices": ["rigid", "affine", "bspline"]},
                 filenames={"label":"parameterfile (optional):", "filter":"*.txt"})
-def register(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', transform: str, filenames: Sequence[Path]) -> 'napari.types.LayerDataTuple':
+def elastix_registration(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', fixed_mask: 'napari.types.ImageData', moving_mask: 'napari.types.ImageData', transform: str, filenames: Sequence[Path]) -> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
         return
     fixed = np.asarray(fixed).astype(np.float32)
     moving = np.asarray(moving).astype(np.float32)
     parameter_object = itk.ParameterObject.New()
-    print(type(filenames[0]))
-    print(filenames[0])
     filename = str(filenames[0])
     if ".txt" in filename:
         transform = 'custom'
@@ -43,12 +42,23 @@ def register(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', 
     else:
         default_rigid_parameter_map = parameter_object.GetDefaultParameterMap(transform, 3)
         parameter_object.AddParameterMap(default_rigid_parameter_map)
-    result_image, result_transform_parameters = itk.elastix_registration_method(
-        fixed, moving,
-        parameter_object=parameter_object,
-        log_to_console=True)
+
+    if fixed_mask is None or moving_mask is None:
+        result_image, result_transform_parameters = itk.elastix_registration_method(
+            fixed, moving,
+            parameter_object=parameter_object,
+            log_to_console=True)
+    else:
+        print(type(fixed_mask))
+        fixed_mask = np.asarray(fixed_mask).astype(np.float32)
+        moving_mask = np.asarray(moving_mask).astype(np.float32)
+        result_image, result_transform_parameters = itk.elastix_registration_method(
+            fixed, moving, fixed_mask, moving_mask,
+            parameter_object=parameter_object,
+            log_to_console=True)
+    # widget.label += 1
     return np.asarray(result_image).astype(np.float32), {'name':transform + ' Registration'}
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    return register, {'area': 'bottom'}
+    return elastix_registration, {'area': 'bottom'}
