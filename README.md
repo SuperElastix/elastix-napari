@@ -6,7 +6,8 @@
 [![tests](https://github.com/ViktorvdValk/elastix_napari/workflows/tests/badge.svg)](https://github.com/ViktorvdValk/elastix_napari/actions)
 [![codecov](https://codecov.io/gh/ViktorvdValk/elastix_napari/branch/master/graph/badge.svg)](https://codecov.io/gh/ViktorvdValk/elastix_napari)
 
-A toolbox for rigid and nonrigid registration of images.
+Still under development.
+The napari plugin for elastix, a toolbox for rigid and nonrigid registration of images.
 
 ----------------------------------
 
