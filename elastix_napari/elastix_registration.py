@@ -16,23 +16,20 @@ import itk
 from pathlib import Path
 from typing import Sequence
 
-# if TYPE_CHECKING:
-# from napari.types import ImageData, LabelsData, LayerDataTuple
+
 def on_init(widget):
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                 transform = {"choices": ["rigid", "affine", "bspline"]},
                 filenames={"label":"parameterfile (optional):", "filter":"*.txt"})
-def register(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', transform: str, filenames: Sequence[Path]) -> 'napari.types.LayerDataTuple':
+def elastix_registration(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', transform: str, filenames: Sequence[Path]) -> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
         return
     fixed = np.asarray(fixed).astype(np.float32)
     moving = np.asarray(moving).astype(np.float32)
     parameter_object = itk.ParameterObject.New()
-    print(type(filenames[0]))
-    print(filenames[0])
     filename = str(filenames[0])
     if ".txt" in filename:
         transform = 'custom'
@@ -51,4 +48,4 @@ def register(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', 
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    return register, {'area': 'bottom'}
+    return elastix_registration, {'area': 'bottom'}
