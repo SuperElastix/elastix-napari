@@ -3,8 +3,5 @@ try:
 except ImportError:
     __version__ = "unknown"
 
-
-
-
 # from ._function import napari_experimental_provide_function
-from ._function import napari_experimental_provide_dock_widget
+from .elastix_registration import napari_experimental_provide_dock_widget
