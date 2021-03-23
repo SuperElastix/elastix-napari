@@ -4,6 +4,7 @@
 import os
 import codecs
 from setuptools import setup, find_packages
+from elastix_napari import __version__
 
 def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
@@ -35,7 +36,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=requirements,
-    version = "0.0.4",
+    version = __version__,
     setup_requires=['setuptools_scm'],
     classifiers=[
         'Development Status :: 4 - Beta',
