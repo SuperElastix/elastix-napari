@@ -5,7 +5,6 @@ import os
 import codecs
 from setuptools import setup, find_packages
 
-
 def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
     return codecs.open(file_path, encoding='utf-8').read()
@@ -36,7 +35,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=requirements,
-    use_scm_version=use_scm,
+    version = "0.0.5",
     setup_requires=['setuptools_scm'],
     classifiers=[
         'Development Status :: 4 - Beta',
