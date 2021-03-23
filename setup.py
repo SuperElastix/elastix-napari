@@ -52,4 +52,5 @@ setup(
         'License :: OSI Approved :: Apache Software License',
     ],
     entry_points={'napari.plugin': 'itk-elastix_napari = elastix_napari'},
+    version = "0.0.2"
 )
