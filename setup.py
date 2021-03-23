@@ -36,7 +36,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=requirements,
-    use_scm_version=use_scm,
+    version = "0.0.2"
     setup_requires=['setuptools_scm'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -52,5 +52,4 @@ setup(
         'License :: OSI Approved :: Apache Software License',
     ],
     entry_points={'napari.plugin': 'itk-elastix_napari = elastix_napari'},
-    version = "0.0.2"
 )
