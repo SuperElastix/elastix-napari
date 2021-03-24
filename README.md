@@ -1,12 +1,11 @@
 # elastix_napari
 
-[![License](https://img.shields.io/pypi/l/elastix_napari.svg?color=green)](https://github.com/ViktorvdValk/elastix_napari/raw/master/LICENSE)
+[![License](https://img.shields.io/pypi/l/elastix_napari.svg?color=green)](https://github.com/SuperElastix/elastix_napari/raw/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/elastix_napari.svg?color=green)](https://pypi.org/project/elastix_napari)
 [![Python Version](https://img.shields.io/pypi/pyversions/elastix_napari.svg?color=green)](https://python.org)
-[![tests](https://github.com/ViktorvdValk/elastix_napari/workflows/tests/badge.svg)](https://github.com/ViktorvdValk/elastix_napari/actions)
-[![codecov](https://codecov.io/gh/ViktorvdValk/elastix_napari/branch/master/graph/badge.svg)](https://codecov.io/gh/ViktorvdValk/elastix_napari)
+[![tests](https://github.com/SuperElastix/elastix_napari/workflows/tests/badge.svg)](https://github.com/SuperElastix/elastix_napari/actions)
+[![codecov](https://codecov.io/gh/SuperElastix/elastix_napari/branch/main/graph/badge.svg)](https://codecov.io/gh/SuperElastix/elastix_napari)
 
-Still under development.
 The napari plugin for elastix, a toolbox for rigid and nonrigid registration of images.
 
 ----------------------------------
@@ -51,7 +50,7 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [Apache Software License 2.0]: http://www.apache.org/licenses/LICENSE-2.0
 [Mozilla Public License 2.0]: https://www.mozilla.org/media/MPL/2.0/index.txt
 [cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin
-[file an issue]: https://github.com/ViktorvdValk/elastix_napari/issues
+[file an issue]: https://github.com/SuperElastix/elastix_napari/issues
 [napari]: https://github.com/napari/napari
 [tox]: https://tox.readthedocs.io/en/latest/
 [pip]: https://pypi.org/project/pip/
