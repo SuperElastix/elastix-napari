@@ -76,8 +76,8 @@ jobs:
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           git tag
           python setup.py sdist bdist_wheel
-          twine upload -r testpypi dist/*
+          twine upload dist/*
