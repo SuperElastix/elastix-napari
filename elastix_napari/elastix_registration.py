@@ -60,6 +60,9 @@ def elastix_registration(fixed: 'napari.types.ImageData', moving: 'napari.types.
         parameter_object.AddParameterMap(default_parameter_map)
 
     if use_masks:
+        if fixed_mask is None or moving_mask is None:
+            print("No masks selected for registration")
+            return
         fixed_mask = np.asarray(fixed_mask).astype(np.float32)
         moving_mask = np.asarray(moving_mask).astype(np.float32)
         result_image, result_transform_parameters = itk.elastix_registration_method(
