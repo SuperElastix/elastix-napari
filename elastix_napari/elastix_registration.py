@@ -23,9 +23,8 @@ def on_init(widget):
     widget.fixed_mask.visible = False
     widget.moving_mask.visible = False
     widget.filenames.visible = False
+
     def toggle_mask_widgets(event):
-		# the event has an attribute `.value` that
-		# will contain whether the button was checked or not
         widget.fixed_mask.visible = event.value
         widget.moving_mask.visible = event.value
 
@@ -39,9 +38,10 @@ def on_init(widget):
     widget.use_masks.changed.connect(toggle_mask_widgets)
     widget.native.layout().addStretch()
 
+
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
-                preset = {"choices": ["rigid", "affine", "bspline", "custom"]},
-                filenames={"label":"parameterfile (optional):", "filter":"*.txt"})
+               preset={"choices": ["rigid", "affine", "bspline", "custom"]},
+               filenames={"label": "parameterfile (optional):", "filter": "*.txt"})
 def elastix_registration(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', fixed_mask: 'napari.types.ImageData', moving_mask: 'napari.types.ImageData', preset: str, filenames: Sequence[Path], use_masks: bool = False) -> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
