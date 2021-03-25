@@ -62,7 +62,7 @@ def test_custom_registration(data_dir):
                           filenames=(str(data_dir / filename),'x'))[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
-    assert mean_diff < 0.001
+    assert mean_diff < 0.1
 
 def test_empty_images():
     im = get_er(None, None, preset='rigid')
