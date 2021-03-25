@@ -23,9 +23,8 @@ def on_init(widget):
     widget.fixed_mask.visible = False
     widget.moving_mask.visible = False
     widget.filenames.visible = False
+
     def toggle_mask_widgets(event):
-		# the event has an attribute `.value` that
-		# will contain whether the button was checked or not
         widget.fixed_mask.visible = event.value
         widget.moving_mask.visible = event.value
 
@@ -39,39 +38,57 @@ def on_init(widget):
     widget.use_masks.changed.connect(toggle_mask_widgets)
     widget.native.layout().addStretch()
 
+
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
-                preset = {"choices": ["rigid", "affine", "bspline", "custom"]},
-                filenames={"label":"parameterfile (optional):", "filter":"*.txt"})
-def elastix_registration(fixed: 'napari.types.ImageData', moving: 'napari.types.ImageData', fixed_mask: 'napari.types.ImageData', moving_mask: 'napari.types.ImageData', preset: str, filenames: Sequence[Path], use_masks: bool = False) -> 'napari.types.LayerDataTuple':
+               preset={"choices": ["rigid", "affine", "bspline", "custom"]},
+               filenames={"label": "parameterfile (optional):",
+               "filter": "*.txt"})
+def elastix_registration(fixed: 'napari.types.ImageData',
+                         moving: 'napari.types.ImageData',
+                         fixed_mask: 'napari.types.ImageData',
+                         moving_mask: 'napari.types.ImageData', preset: str,
+                         filenames: Sequence[Path], use_masks: bool = False
+                         )-> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
         return
+
+    # Casting to numpy is currently necessary
+    # because of napari's type ambiguity.
     fixed = np.asarray(fixed).astype(np.float32)
     moving = np.asarray(moving).astype(np.float32)
+
     parameter_object = itk.ParameterObject.New()
     filename = str(filenames[0])
     if preset == "custom":
         try:
             parameter_object.AddParameterFile(filename)
         except:
-            print("Parameter file not found or not valid.")
+            raise TypeError("Parameter file not found or not valid")
     else:
-        default_parameter_map = parameter_object.GetDefaultParameterMap(preset, 3)
+        default_parameter_map = parameter_object.GetDefaultParameterMap(preset)
         parameter_object.AddParameterMap(default_parameter_map)
 
     if use_masks:
-        fixed_mask = np.asarray(fixed_mask).astype(np.float32)
-        moving_mask = np.asarray(moving_mask).astype(np.float32)
-        result_image, result_transform_parameters = itk.elastix_registration_method(
-            fixed, moving, fixed_mask, moving_mask,
-            parameter_object=parameter_object,
-            log_to_console=True)
-    else:
-        result_image, result_transform_parameters = itk.elastix_registration_method(
-            fixed, moving,
-            parameter_object=parameter_object,
-            log_to_console=True)
+        if fixed_mask is None and moving_mask is None:
+            print("No masks selected for registration")
+            return
+        else:
+            # Casting to numpy and itk is currently necessary
+            # because of napari's type ambiguity.
+            fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
+            fixed_mask = itk.image_view_from_array(fixed_mask)
+            moving_mask = np.asarray(moving_mask).astype(np.uint8)
+            moving_mask = itk.image_view_from_array(moving_mask)
 
+            result_image, result_transform_parameters = \
+                itk.elastix_registration_method(
+                    fixed, moving, parameter_object, fixed_mask=fixed_mask,
+                    moving_mask=moving_mask, log_to_console=False)
+    else:
+        result_image, result_transform_parameters = \
+            itk.elastix_registration_method(fixed, moving, parameter_object,
+                                            log_to_console=False)
     return np.asarray(result_image).astype(np.float32), {'name':preset + ' Registration'}
 
 
