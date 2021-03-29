@@ -22,7 +22,9 @@ def on_init(widget):
 
     widget.fixed_mask.visible = False
     widget.moving_mask.visible = False
-    widget.filenames.visible = False
+    widget.param1.visible = False
+    widget.param2.visible = False
+    widget.param3.visible = False
 
     def toggle_mask_widgets(event):
         widget.fixed_mask.visible = event.value
@@ -30,9 +32,13 @@ def on_init(widget):
 
     def toggle_preset_widget(event):
         if event.value == "custom":
-            widget.filenames.visible = True
+            widget.param1.visible = True
+            widget.param2.visible = True
+            widget.param3.visible = True
         else:
-            widget.filenames.visible = False
+            widget.param1.visible = False
+            widget.param2.visible = False
+            widget.param3.visible = False
 
     widget.preset.changed.connect(toggle_preset_widget)
     widget.use_masks.changed.connect(toggle_mask_widgets)
@@ -41,13 +47,16 @@ def on_init(widget):
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                preset={"choices": ["rigid", "affine", "bspline", "custom"]},
-               filenames={"label": "parameterfile (optional):",
+               param1={"label": "parameterfile:",
+               "filter": "*.txt"}, param2={"label": "parameterfile 2",
+               "filter": "*.txt"}, param3={"label": "parameterfile 3",
                "filter": "*.txt"})
 def elastix_registration(fixed: 'napari.types.ImageData',
                          moving: 'napari.types.ImageData',
                          fixed_mask: 'napari.types.ImageData',
                          moving_mask: 'napari.types.ImageData', preset: str,
-                         filenames: Sequence[Path], use_masks: bool = False
+                         param1: Sequence[Path], param2: Sequence[Path],
+                         param3: Sequence[Path], use_masks: bool = False
                          )-> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
@@ -59,12 +68,17 @@ def elastix_registration(fixed: 'napari.types.ImageData',
     moving = np.asarray(moving).astype(np.float32)
 
     parameter_object = itk.ParameterObject.New()
-    filename = str(filenames[0])
     if preset == "custom":
-        try:
-            parameter_object.AddParameterFile(filename)
-        except:
-            raise TypeError("Parameter file not found or not valid")
+        for par_sequence in [param1, param2, param3]:
+            par = str(par_sequence[0])
+            if ".txt" in par:
+                try:
+                    parameter_object.AddParameterFile(par)
+                except:
+                    raise TypeError("Parameter file not found or not valid")
+            else:
+                pass
+
     else:
         default_parameter_map = parameter_object.GetDefaultParameterMap(preset)
         parameter_object.AddParameterMap(default_parameter_map)
@@ -76,15 +90,34 @@ def elastix_registration(fixed: 'napari.types.ImageData',
         else:
             # Casting to numpy and itk is currently necessary
             # because of napari's type ambiguity.
-            fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
-            fixed_mask = itk.image_view_from_array(fixed_mask)
-            moving_mask = np.asarray(moving_mask).astype(np.uint8)
-            moving_mask = itk.image_view_from_array(moving_mask)
+            if not (fixed_mask is None):
+                fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
+                fixed_mask = itk.image_view_from_array(fixed_mask)
 
-            result_image, result_transform_parameters = \
-                itk.elastix_registration_method(
-                    fixed, moving, parameter_object, fixed_mask=fixed_mask,
-                    moving_mask=moving_mask, log_to_console=False)
+                if not (moving_mask is None):
+                    moving_mask = np.asarray(moving_mask).astype(np.uint8)
+                    moving_mask = itk.image_view_from_array(moving_mask)
+
+                    result_image, result_transform_parameters = \
+                        itk.elastix_registration_method(
+                            fixed, moving, parameter_object,
+                            fixed_mask=fixed_mask,moving_mask=moving_mask,
+                            log_to_console=False)
+                else:
+                    result_image, result_transform_parameters = \
+                        itk.elastix_registration_method(
+                            fixed, moving, parameter_object,
+                            fixed_mask=fixed_mask,log_to_console=False)
+            else:
+                if not (moving_mask is None):
+                    moving_mask = np.asarray(moving_mask).astype(np.uint8)
+                    moving_mask = itk.image_view_from_array(moving_mask)
+
+                    result_image, result_transform_parameters = \
+                        itk.elastix_registration_method(
+                            fixed, moving, parameter_object,
+                            moving_mask=moving_mask, log_to_console=False)
+
     else:
         result_image, result_transform_parameters = \
             itk.elastix_registration_method(fixed, moving, parameter_object,

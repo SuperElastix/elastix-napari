@@ -5,10 +5,6 @@ import os
 import codecs
 from setuptools import setup, find_packages
 
-# def read(fname):
-#     file_path = os.path.join(os.path.dirname(__file__), fname)
-#     return codecs.open(file_path, encoding='utf-8').read()
-
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
     with codecs.open(os.path.join(here, rel_path), 'r') as fp:
