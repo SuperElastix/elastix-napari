@@ -26,6 +26,7 @@ def on_init(widget):
     widget.param2.visible = False
     widget.param3.visible = False
 
+
     def toggle_mask_widgets(event):
         widget.fixed_mask.visible = event.value
         widget.moving_mask.visible = event.value
@@ -47,6 +48,7 @@ def on_init(widget):
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                preset={"choices": ["rigid", "affine", "bspline", "custom"]},
+
                param1={"label": "parameterfile:",
                "filter": "*.txt"}, param2={"label": "parameterfile 2",
                "filter": "*.txt"}, param3={"label": "parameterfile 3",
@@ -57,6 +59,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                          moving_mask: 'napari.types.ImageData', preset: str,
                          param1: Sequence[Path], param2: Sequence[Path],
                          param3: Sequence[Path], use_masks: bool = False
+
                          )-> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
@@ -78,7 +81,6 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                     raise TypeError("Parameter file not found or not valid")
             else:
                 pass
-
     else:
         default_parameter_map = parameter_object.GetDefaultParameterMap(preset)
         parameter_object.AddParameterMap(default_parameter_map)
@@ -90,6 +92,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
         else:
             # Casting to numpy and itk is currently necessary
             # because of napari's type ambiguity.
+
             if not (fixed_mask is None):
                 fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
                 fixed_mask = itk.image_view_from_array(fixed_mask)
