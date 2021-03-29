@@ -59,7 +59,7 @@ def test_custom_registration(data_dir):
 
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
-                          filenames=(str(data_dir / filename),'x'))[0]
+                          param1=(str(data_dir / filename),'x'), param2=(str(data_dir / filename), 'x'))[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.1
