@@ -4,14 +4,28 @@ import itk
 from elastix_napari import elastix_registration
 import numpy as np
 
+
 # Test widget function
 def test_dock_widget():
-    assert elastix_napari.napari_experimental_provide_dock_widget() != None
+    assert elastix_napari.napari_experimental_provide_dock_widget() is not None
+
 
 # Helper functions
-def image_generator(x1, x2, y1, y2, mask=False, artefact=False):
+def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
+                    pointset=False, ps_name='fixed', data_dir='none'):
     if mask:
         image = np.zeros([100, 100], np.uint8)
+    elif pointset:
+        # Create fixed point set
+        filename = ps_name + "_point_set_test.txt"
+        point_set = open(str(data_dir / filename), "w+")
+        point_set.write("point\n4\n")
+        point_set.write(str(x1) + " " + str(y1) + "\n")
+        point_set.write(str(x1) + " " + str(y2) + "\n")
+        point_set.write(str(x2) + " " + str(y1) + "\n")
+        point_set.write(str(x2) + " " + str(y2) + "\n")
+        point_set.close()
+        return str(data_dir / filename)
     else:
         image = np.zeros([100, 100], np.float32)
     image[y1:y2, x1:x2] = 1
@@ -20,17 +34,21 @@ def image_generator(x1, x2, y1, y2, mask=False, artefact=False):
     image = itk.image_view_from_array(image)
     return image
 
+
 def get_er(*args, **kwargs):
     er_func = elastix_registration.elastix_registration()
-    return er_func(*args,**kwargs)
+    return er_func(*args, **kwargs)
+
 
 # Test normal registration
 def test_registration():
-    fixed_image = image_generator(25,75,25,75)
-    moving_image = image_generator(1,51,10,60)
-    result_image = get_er(fixed_image, moving_image, preset='rigid')[0]
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+    result_image = get_er(fixed_image, moving_image, preset='rigid',
+                          focus='none')[0]
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.001
+
 
 # Test Masked registration
 def test_masked_registration():
@@ -43,36 +61,56 @@ def test_masked_registration():
 
     result_image = get_er(fixed=fixed_image, moving=moving_image,
                           fixed_mask=fixed_mask, moving_mask=moving_mask,
-                          preset='rigid', use_masks=True)[0]
+                          preset='rigid', focus='masks')[0]
 
     # Filter artifacts out of the images.
-    masked_fixed_image = np.asarray(fixed_image)[0:90,0:90]
+    masked_fixed_image = np.asarray(fixed_image)[0:90, 0:90]
     masked_result_image = result_image[0:90, 0:90]
 
     mean_diff = np.absolute(np.subtract(masked_fixed_image,
                                         masked_result_image)).mean()
     assert mean_diff < 0.001
 
+
+def test_pointset_registration(data_dir):
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+
+    # Create pointsets for artefact
+    fixed_ps = image_generator(25, 75, 25, 75, pointset=True, ps_name='fixed',
+                               data_dir=data_dir)
+    moving_ps = image_generator(1, 51, 10, 60, pointset=True, ps_name='moving',
+                                data_dir=data_dir)
+
+    result_image = get_er(fixed_image, moving_image, fixed_ps=fixed_ps,
+                          moving_ps=moving_ps, preset='rigid',
+                          focus='pointset')[0]
+
+    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+    assert mean_diff < 0.001
+
+
 def test_custom_registration(data_dir):
-    fixed_image = image_generator(25,75,25,75)
-    moving_image = image_generator(1,51,10,60)
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
 
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
-                          param1=(str(data_dir / filename),'x'), param2=(str(data_dir / filename), 'x'))[0]
+                          focus='none', param1=(str(data_dir / filename), 'x'),
+                          param2=(str(data_dir / filename), 'x'))[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.1
 
+
 def test_empty_images():
-    im = get_er(None, None, preset='rigid')
-    assert im == None
+    im = get_er(None, None, preset='rigid', focus='none')
+    assert im is None
+
 
 def test_empty_masks():
-    fixed_image = image_generator(25,75,25,75)
-    moving_image = image_generator(1,51,10,60)
-    im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None, preset='rigid', use_masks=True)
-    assert im == None
-# print(test_registration())
-# print(test_custom_registration(data_dir))
-# print(elastix_registration.elastix_registration()())
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+    im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None,
+                preset='rigid', focus='masks')
+    assert im is None

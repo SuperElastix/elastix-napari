@@ -25,11 +25,25 @@ def on_init(widget):
     widget.param1.visible = False
     widget.param2.visible = False
     widget.param3.visible = False
-
+    widget.fixed_ps.visible = False
+    widget.moving_ps.visible = False
 
     def toggle_mask_widgets(event):
-        widget.fixed_mask.visible = event.value
-        widget.moving_mask.visible = event.value
+        if event.value == "none":
+            widget.fixed_mask.visible = False
+            widget.moving_mask.visible = False
+            widget.fixed_ps.visible = False
+            widget.moving_ps.visible = False
+        elif event.value == "masks":
+            widget.fixed_mask.visible = True
+            widget.moving_mask.visible = True
+            widget.fixed_ps.visible = False
+            widget.moving_ps.visible = False
+        elif event.value == "pointset":
+            widget.fixed_mask.visible = False
+            widget.moving_mask.visible = False
+            widget.fixed_ps.visible = True
+            widget.moving_ps.visible = True
 
     def toggle_preset_widget(event):
         if event.value == "custom":
@@ -42,25 +56,27 @@ def on_init(widget):
             widget.param3.visible = False
 
     widget.preset.changed.connect(toggle_preset_widget)
-    widget.use_masks.changed.connect(toggle_mask_widgets)
+    widget.focus.changed.connect(toggle_mask_widgets)
     widget.native.layout().addStretch()
 
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                preset={"choices": ["rigid", "affine", "bspline", "custom"]},
-
-               param1={"label": "parameterfile:",
-               "filter": "*.txt"}, param2={"label": "parameterfile 2",
-               "filter": "*.txt"}, param3={"label": "parameterfile 3",
-               "filter": "*.txt"})
+               focus={"choices": ["none", "pointset", "masks"]},
+               fixed_ps={"label": "fixed pointset", "filter": "*.txt"},
+               moving_ps={"label": "moving pointset", "filter": "*.txt"},
+               param1={"label": "parameterfile", "filter": "*.txt"},
+               param2={"label": "parameterfile 2", "filter": "*.txt"},
+               param3={"label": "parameterfile 3", "filter": "*.txt"})
 def elastix_registration(fixed: 'napari.types.ImageData',
                          moving: 'napari.types.ImageData',
                          fixed_mask: 'napari.types.ImageData',
-                         moving_mask: 'napari.types.ImageData', preset: str,
-                         param1: Sequence[Path], param2: Sequence[Path],
-                         param3: Sequence[Path], use_masks: bool = False
+                         moving_mask: 'napari.types.ImageData',
+                         fixed_ps: Sequence[Path], moving_ps: Sequence[Path],
+                         preset: str, focus: str, param1: Sequence[Path],
+                         param2: Sequence[Path], param3: Sequence[Path]
+                         ) -> 'napari.types.LayerDataTuple':
 
-                         )-> 'napari.types.LayerDataTuple':
     if fixed is None or moving is None:
         print("No images selected for registration.")
         return
@@ -85,7 +101,12 @@ def elastix_registration(fixed: 'napari.types.ImageData',
         default_parameter_map = parameter_object.GetDefaultParameterMap(preset)
         parameter_object.AddParameterMap(default_parameter_map)
 
-    if use_masks:
+    if focus == "none":
+        result_image, result_transform_parameters = \
+            itk.elastix_registration_method(fixed, moving, parameter_object,
+                                            log_to_console=False)
+
+    elif focus == "masks":
         if fixed_mask is None and moving_mask is None:
             print("No masks selected for registration")
             return
@@ -93,39 +114,53 @@ def elastix_registration(fixed: 'napari.types.ImageData',
             # Casting to numpy and itk is currently necessary
             # because of napari's type ambiguity.
 
-            if not (fixed_mask is None):
+            if moving_mask is None:
                 fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
                 fixed_mask = itk.image_view_from_array(fixed_mask)
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, parameter_object, fixed_mask=fixed_mask,
+                    log_to_console=False)
 
-                if not (moving_mask is None):
-                    moving_mask = np.asarray(moving_mask).astype(np.uint8)
-                    moving_mask = itk.image_view_from_array(moving_mask)
-
-                    result_image, result_transform_parameters = \
-                        itk.elastix_registration_method(
-                            fixed, moving, parameter_object,
-                            fixed_mask=fixed_mask,moving_mask=moving_mask,
-                            log_to_console=False)
-                else:
-                    result_image, result_transform_parameters = \
-                        itk.elastix_registration_method(
-                            fixed, moving, parameter_object,
-                            fixed_mask=fixed_mask,log_to_console=False)
+            elif fixed_mask is None:
+                moving_mask = np.asarray(moving_mask).astype(np.uint8)
+                moving_mask = itk.image_view_from_array(moving_mask)
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, parameter_object, moving_mask=moving_mask,
+                    log_to_console=False)
             else:
-                if not (moving_mask is None):
-                    moving_mask = np.asarray(moving_mask).astype(np.uint8)
-                    moving_mask = itk.image_view_from_array(moving_mask)
+                fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
+                fixed_mask = itk.image_view_from_array(fixed_mask)
+                moving_mask = np.asarray(moving_mask).astype(np.uint8)
+                moving_mask = itk.image_view_from_array(moving_mask)
 
-                    result_image, result_transform_parameters = \
-                        itk.elastix_registration_method(
-                            fixed, moving, parameter_object,
-                            moving_mask=moving_mask, log_to_console=False)
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, parameter_object, fixed_mask=fixed_mask,
+                    moving_mask=moving_mask, log_to_console=False)
 
-    else:
-        result_image, result_transform_parameters = \
-            itk.elastix_registration_method(fixed, moving, parameter_object,
-                                            log_to_console=False)
-    return np.asarray(result_image).astype(np.float32), {'name':preset + ' Registration'}
+    elif focus == "pointset":
+        if fixed_ps is None and moving_ps is None:
+            print("No pointsets selected for registration")
+            return
+        else:
+            if fixed_ps is None:
+                moving_ps = str(moving_ps[0])
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, moving_point_set_file_name=moving_ps,
+                    log_to_console=False, parameter_object=parameter_object)
+            elif moving_ps is None:
+                fixed_ps = str(fixed_ps[0])
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, fixed_point_set_file_name=fixed_ps,
+                    log_to_console=False, parameter_object=parameter_object)
+            else:
+                fixed_ps = str(fixed_ps[0])
+                moving_ps = str(moving_ps[0])
+                result_image, rtp = itk.elastix_registration_method(
+                    fixed, moving, fixed_point_set_file_name=fixed_ps,
+                    moving_point_set_file_name=moving_ps, log_to_console=False,
+                    parameter_object=parameter_object)
+
+    return np.asarray(result_image).astype(np.float32), {'name': preset + ' ' + focus + ' Registration'}
 
 
 @napari_hook_implementation
