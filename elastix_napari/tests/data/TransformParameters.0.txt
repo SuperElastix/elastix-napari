@@ -1,0 +1,40 @@
+(Transform "EulerTransform")
+(NumberOfParameters 3)
+(TransformParameters 0 0 0)
+(InitialTransformParametersFileName "NoInitialTransform")
+(UseBinaryFormatForTransformationParameters "false")
+(HowToCombineTransforms "Compose")
+(CenterOfRotationPoint 50 50)
+
+// Image specific
+(FixedImageDimension 2)
+(MovingImageDimension 2)
+(FixedInternalImagePixelType "float")
+(MovingInternalImagePixelType "float")
+(Size 100 100)
+(Index 0 0)
+(Spacing 1.0000000000 1.0000000000)
+(Origin 0.0000000000 0.0000000000)
+(Direction 1.0000000000 0.0000000000 0.0000000000 1.0000000000)
+(UseDirectionCosines "true")
+
+
+// BSplineTransform specific
+(GridSize 19 19)
+(GridIndex 0 0)
+(GridSpacing 16.0000000000 16.0000000000)
+(GridOrigin -16.5000000000 -16.5000000000)
+(GridDirection 1.0000000000 0.0000000000 0.0000000000 1.0000000000)
+(BSplineTransformSplineOrder 3)
+(UseCyclicTransform "false")
+
+// ResampleInterpolator specific
+(ResampleInterpolator "FinalBSplineInterpolator")
+(FinalBSplineInterpolationOrder 1)
+
+// Resampler specific
+(Resampler "DefaultResampler")
+(DefaultPixelValue 0.000000)
+(ResultImageFormat "mhd")
+(ResultImagePixelType "float")
+(CompressResultImage "false")

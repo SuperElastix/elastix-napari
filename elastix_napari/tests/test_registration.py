@@ -72,6 +72,7 @@ def test_masked_registration():
     assert mean_diff < 0.001
 
 
+# Test Point set registration
 def test_pointset_registration(data_dir):
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
@@ -90,6 +91,7 @@ def test_pointset_registration(data_dir):
     assert mean_diff < 0.001
 
 
+# Test registration with custom parameter textfiles
 def test_custom_registration(data_dir):
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
@@ -100,7 +102,21 @@ def test_custom_registration(data_dir):
                           param2=(str(data_dir / filename), 'x'))[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
-    assert mean_diff < 0.1
+    assert mean_diff < 0.01
+
+
+def test_initial_transform(data_dir):
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+
+    init_trans_filename = "TransformParameters.0.txt"
+    result_image = get_er(
+        fixed_image, moving_image, preset='rigid', focus='none',
+        init_trans=(str(data_dir / init_trans_filename), 'x'),
+        metric='default', optimizer='default', resolutions=6,
+        max_iterations=500, advanced=True)[0]
+    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+    assert mean_diff < 0.01
 
 
 def test_empty_images():
