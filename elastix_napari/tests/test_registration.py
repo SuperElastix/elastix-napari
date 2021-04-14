@@ -25,7 +25,7 @@ def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
         point_set.write(str(x2) + " " + str(y1) + "\n")
         point_set.write(str(x2) + " " + str(y2) + "\n")
         point_set.close()
-        return str(data_dir / filename)
+        return (str(data_dir / filename), 'x')
     else:
         image = np.zeros([100, 100], np.float32)
     image[y1:y2, x1:x2] = 1
@@ -44,8 +44,7 @@ def get_er(*args, **kwargs):
 def test_registration():
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
-    result_image = get_er(fixed_image, moving_image, preset='rigid',
-                          focus='none')[0]
+    result_image = get_er(fixed_image, moving_image, preset='rigid')[0]
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.001
 
@@ -61,7 +60,7 @@ def test_masked_registration():
 
     result_image = get_er(fixed=fixed_image, moving=moving_image,
                           fixed_mask=fixed_mask, moving_mask=moving_mask,
-                          preset='rigid', focus='masks')[0]
+                          preset='rigid', masks=True)[0]
 
     # Filter artifacts out of the images.
     masked_fixed_image = np.asarray(fixed_image)[0:90, 0:90]
@@ -85,7 +84,7 @@ def test_pointset_registration(data_dir):
 
     result_image = get_er(fixed_image, moving_image, fixed_ps=fixed_ps,
                           moving_ps=moving_ps, preset='rigid',
-                          focus='pointset')[0]
+                          metric='default', advanced=True)[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.001
@@ -98,7 +97,7 @@ def test_custom_registration(data_dir):
 
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
-                          focus='none', param1=(str(data_dir / filename), 'x'),
+                          param1=(str(data_dir / filename), 'x'),
                           param2=(str(data_dir / filename), 'x'))[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
@@ -111,16 +110,15 @@ def test_initial_transform(data_dir):
 
     init_trans_filename = "TransformParameters.0.txt"
     result_image = get_er(
-        fixed_image, moving_image, preset='rigid', focus='none',
+        fixed_image, moving_image, preset='rigid',
         init_trans=(str(data_dir / init_trans_filename), 'x'),
-        metric='default', optimizer='default', resolutions=6,
-        max_iterations=500, advanced=True)[0]
+        metric='default', resolutions=6, max_iterations=500, advanced=True)[0]
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.01
 
 
 def test_empty_images():
-    im = get_er(None, None, preset='rigid', focus='none')
+    im = get_er(None, None, preset='rigid')
     assert im is None
 
 
@@ -128,5 +126,5 @@ def test_empty_masks():
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
     im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None,
-                preset='rigid', focus='masks')
+                preset='rigid', masks=True)
     assert im is None
