@@ -3,6 +3,7 @@ import elastix_napari
 import itk
 from elastix_napari import elastix_registration
 import numpy as np
+from qtpy.QtWidgets import QMessageBox
 
 
 # Test widget function
@@ -84,7 +85,7 @@ def test_pointset_registration(data_dir):
 
     result_image = get_er(fixed_image, moving_image, fixed_ps=fixed_ps,
                           moving_ps=moving_ps, preset='rigid',
-                          metric='default', advanced=True)[0]
+                          metric='from preset', advanced=True)[0]
 
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.001
@@ -112,14 +113,15 @@ def test_initial_transform(data_dir):
     result_image = get_er(
         fixed_image, moving_image, preset='rigid',
         init_trans=(str(data_dir / init_trans_filename), 'x'),
-        metric='default', resolutions=6, max_iterations=500, advanced=True)[0]
+        metric='from preset', resolutions=6, max_iterations=500,
+        advanced=True)[0]
     mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
     assert mean_diff < 0.01
 
 
 def test_empty_images():
     im = get_er(None, None, preset='rigid')
-    assert im is None
+    assert isinstance(im, QMessageBox)
 
 
 def test_empty_masks():
@@ -127,4 +129,4 @@ def test_empty_masks():
     moving_image = image_generator(1, 51, 10, 60)
     im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None,
                 preset='rigid', masks=True)
-    assert im is None
+    assert isinstance(im, QMessageBox)

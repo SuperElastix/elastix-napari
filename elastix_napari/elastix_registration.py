@@ -15,6 +15,24 @@ from magicgui import magic_factory
 import itk
 from pathlib import Path
 from typing import Sequence
+from qtpy.QtWidgets import QMessageBox
+
+
+def error(message):
+    e = QMessageBox()
+    label = QMessageBox()
+    e.setText(message)
+    e.setIcon(QMessageBox.Critical)
+    e.setWindowTitle("Error")
+    e.show()
+    return e
+
+
+def check_pointset(pointset):
+    if '.txt' in str(pointset[0]) or '.vtk' in str(pointset[0]):
+        return True
+    else:
+        return False
 
 
 def on_init(widget):
@@ -61,33 +79,34 @@ def on_init(widget):
     widget.advanced.changed.connect(toggle_advanced_widget)
     widget.native.layout().addStretch()
 
-# optimizer={"choices": ["default",
-#                        "AdaptiveStochasticGradientDescent",
-#                        "AdaptiveStochasticLBFGS",
-#                        "ConjugateGradient", "QuasiNewtonLBFGS",
-#                        "RegularStepGradientDescent"
-#                        "StandardGradientDescent"]},
-
 
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
-               preset={"choices": ["rigid", "affine", "bspline", "custom"]},
-               fixed_ps={"label": "fixed point set", "filter": "*.txt"},
-               moving_ps={"label": "moving point set", "filter": "*.txt"},
-               param1={"label": "parameterfile", "filter": "*.txt"},
-               param2={"label": "parameterfile 2", "filter": "*.txt"},
-               param3={"label": "parameterfile 3", "filter": "*.txt"},
-               metric={"choices": ["default",
+               preset={"choices": ["rigid", "affine", "bspline", "custom"],
+                       "tooltip": "Select a preset parameter file or select "
+                       "custom to load a custom one"},
+               fixed_ps={"label": "fixed point set", "filter": "*.txt",
+                         "tooltip": "Load a fixed point set"},
+               moving_ps={"label": "moving point set", "filter": "*.txt",
+                          "tooltip": "Load a moving point set"},
+               param1={"label": "parameterfile 1", "filter": "*.txt",
+                       "tooltip": 'Load a custom parameter file'},
+               param2={"label": "parameterfile 2", "filter": "*.txt",
+                       "tooltip": 'Optionally load a second custom parameter '
+                       'file'},
+               param3={"label": "parameterfile 3", "filter": "*.txt",
+                       "tooltip": 'Optionally load a third custom parameter '
+                       'file'},
+               metric={"choices": ["from preset",
                                    "AdvancedMattesMutualInformation",
                                    "AdvancedNormalizedCorrelation",
-                                   "AdvancedMeanSquares",
-                                   "DisplacementMagnitudePenalty",
-                                   "GradientDifference",
-                                   "KNNGraphAlphaMutualInformation",
-                                   "PatternIntensity",
-                                   "PCAMetric2",
-                                   "VarianceOverLastDimensionMetric"]},
-               init_trans={"label": "initial transform", "filter": "*.txt"},
-               nr_spatial_samples={"max": 8192, "step": 256})
+                                   "AdvancedMeanSquares"],
+                       "tooltip": 'Select a metric to use'},
+               init_trans={"label": "initial transform", "filter": "*.txt",
+                           "tooltip": 'Load a initial transform from a .txt '
+                           'file'},
+               nr_spatial_samples={"max": 8192, "step": 256,
+                                   "tooltip": 'Select the number of spatial '
+                                   'samples to use'})
 def elastix_registration(fixed: 'napari.types.ImageData',
                          moving: 'napari.types.ImageData', preset: str,
                          fixed_mask: 'napari.types.ImageData',
@@ -104,18 +123,21 @@ def elastix_registration(fixed: 'napari.types.ImageData',
 
     if fixed is None or moving is None:
         print("No images selected for registration.")
-        return
+        return error("No images selected for registration.")
+    if check_pointset(fixed_ps) != check_pointset(moving_ps):
+        print("Select both fixed and moving point set.")
+        return error("Select both fixed and moving point set.")
 
     if advanced:
-        if '.txt' in str(init_trans[0]):
+        if check_pointset(init_trans):
             init_trans = str(init_trans[0])
         else:
             init_trans = ''
-        if '.txt' in str(fixed_ps[0]):
+        if check_pointset(fixed_ps):
             fixed_ps = str(fixed_ps[0])
         else:
             fixed_ps = ''
-        if '.txt' in str(moving_ps[0]):
+        if check_pointset(moving_ps):
             moving_ps = str(moving_ps[0])
         else:
             moving_ps = ''
@@ -137,14 +159,14 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                 try:
                     parameter_object.AddParameterFile(par)
                 except:
-                    raise TypeError("Parameter file not found or not valid")
+                    return error("Parameter file not found or not valid")
             else:
                 pass
     else:
         if advanced:
             parameter_map = \
                 parameter_object.GetDefaultParameterMap(preset, resolutions)
-            if metric != 'default':
+            if metric != 'from preset':
                 parameter_map['Metric'] = [metric]
             if fixed_ps != '' and moving_ps != '':
                 parameter_map['Registration'] = [
@@ -172,7 +194,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
     elif masks:
         if fixed_mask is None and moving_mask is None:
             print("No masks selected for registration")
-            return
+            return error("No masks selected for registration")
         else:
             # Casting to numpy and itk is currently necessary
             # because of napari's type ambiguity.
@@ -209,32 +231,6 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                     moving_point_set_file_name=moving_ps,
                     initial_transform_parameter_file_name=init_trans,
                     log_to_console=False)
-
-    # elif focus == "pointset":
-    #     if fixed_ps is None and moving_ps is None:
-    #         print("No pointsets selected for registration")
-    #         return
-    #     else:
-    #         if fixed_ps is None:
-    #             moving_ps = str(moving_ps[0])
-    #             result_image, rtp = itk.elastix_registration_method(
-    #                 fixed, moving, moving_point_set_file_name=moving_ps,
-    #                 initial_transform_parameter_file_name=init_trans,
-    #                 log_to_console=False, parameter_object=parameter_object)
-    #         elif moving_ps is None:
-    #             fixed_ps = str(fixed_ps[0])
-    #             result_image, rtp = itk.elastix_registration_method(
-    #                 fixed, moving, fixed_point_set_file_name=fixed_ps,
-    #                 initial_transform_parameter_file_name=init_trans,
-    #                 log_to_console=False, parameter_object=parameter_object)
-    #         else:
-    #             fixed_ps = str(fixed_ps[0])
-    #             moving_ps = str(moving_ps[0])
-    #             result_image, rtp = itk.elastix_registration_method(
-    #                 fixed, moving, fixed_point_set_file_name=fixed_ps,
-    #                 initial_transform_parameter_file_name=init_trans,
-    #                 moving_point_set_file_name=moving_ps, log_to_console=False,
-    #                 parameter_object=parameter_object)
 
     return np.asarray(result_image).astype(np.float32), {'name': preset + ' Registration'}
 
