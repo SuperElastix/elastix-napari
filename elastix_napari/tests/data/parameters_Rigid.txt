@@ -28,14 +28,14 @@
 
 // The following components should usually be left as they are:
 (Registration "MultiResolutionRegistration")
-(Interpolator "BSplineInterpolator")
+(Interpolator "LinearInterpolator")
 (ResampleInterpolator "FinalBSplineInterpolator")
 (Resampler "DefaultResampler")
 
 // These may be changed to Fixed/MovingSmoothingImagePyramid.
 // See the manual.
-(FixedImagePyramid "FixedRecursiveImagePyramid")
-(MovingImagePyramid "MovingRecursiveImagePyramid")
+(FixedImagePyramid "FixedSmoothingImagePyramid")
+(MovingImagePyramid "MovingSmoothingImagePyramid")
 
 // The following components are most important:
 // The optimizer AdaptiveStochasticGradientDescent (ASGD) works
@@ -80,7 +80,7 @@
 // The number of resolutions. 1 Is only enough if the expected
 // deformations are small. 3 or 4 mostly works fine. For large
 // images and large deformations, 5 or 6 may even be useful.
-(NumberOfResolutions 5)
+(NumberOfResolutions 6)
 
 // The downsampling/blurring factors for the image pyramids.
 // By default, the images are downsampled by a factor of 2
@@ -120,7 +120,7 @@
 // them randomly. See the manual for information on other sampling
 // strategies.
 (NewSamplesEveryIteration "true")
-(ImageSampler "Random")
+(ImageSampler "RandomCoordinate")
 
 // ************* Interpolation and Resampling ****************
 
@@ -148,5 +148,5 @@
 (WriteResultImage "true")
 
 // The pixel type and format of the resulting deformed moving image
-(ResultImagePixelType "short")
+(ResultImagePixelType "float")
 (ResultImageFormat "mhd")
