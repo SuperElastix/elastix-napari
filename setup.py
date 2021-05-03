@@ -36,7 +36,7 @@ setup(
     author='Viktor van der Valk',
     author_email='v.o.van_der_valk@lumc.nl',
     license='Apache Software License 2.0',
-    url='https://github.com/ViktorvdValk/elastix_napari',
+    url='https://github.com/SuperElastix/elastix_napari',
     description='A toolbox for rigid and nonrigid registration of images.',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
