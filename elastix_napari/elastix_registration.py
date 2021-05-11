@@ -83,7 +83,7 @@ def on_init(widget):
 @magic_factory(widget_init=on_init, layout='vertical', call_button="register",
                preset={"choices": ["rigid", "affine", "bspline", "custom"],
                        "tooltip": "Select a preset parameter file or select "
-                       "custom to load a custom one"},
+                       "the 'custom' option to load a custom one"},
                fixed_ps={"label": "fixed point set", "filter": "*.txt",
                          "tooltip": "Load a fixed point set"},
                moving_ps={"label": "moving point set", "filter": "*.txt",
@@ -96,8 +96,7 @@ def on_init(widget):
                param3={"label": "parameterfile 3", "filter": "*.txt",
                        "tooltip": 'Optionally load a third custom parameter '
                        'file'},
-               metric={"choices": ["from preset",
-                                   "AdvancedMattesMutualInformation",
+               metric={"choices": ["AdvancedMattesMutualInformation",
                                    "AdvancedNormalizedCorrelation",
                                    "AdvancedMeanSquares"],
                        "tooltip": 'Select a metric to use'},
@@ -114,8 +113,8 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                          fixed_ps: Sequence[Path], moving_ps: Sequence[Path],
                          param1: Sequence[Path], param2: Sequence[Path],
                          param3: Sequence[Path], init_trans: Sequence[Path],
-                         metric: str, resolutions: int = 4,
-                         max_iterations: int = 500,
+                         metric: str = "AdvancedMattesMutualInformation",
+                         resolutions: int = 4, max_iterations: int = 500,
                          nr_spatial_samples: int = 512,
                          max_step_length: float = 1.0,  masks: bool = False,
                          advanced: bool = False
@@ -166,8 +165,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
         if advanced:
             parameter_map = \
                 parameter_object.GetDefaultParameterMap(preset, resolutions)
-            if metric != 'from preset':
-                parameter_map['Metric'] = [metric]
+            parameter_map['Metric'] = [metric]
             if fixed_ps != '' and moving_ps != '':
                 parameter_map['Registration'] = [
                     'MultiMetricMultiResolutionRegistration']
