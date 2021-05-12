@@ -12,6 +12,8 @@ For tutorials on how to use elastix, see our [Jupyter notebooks].
 
 To find parameters that work well with specific datasets, see the [elastix Model Zoo].
 
+<img width="1438" alt="Screenshot 2021-05-12 at 15 07 24" src="https://user-images.githubusercontent.com/33719474/117980045-d6009b00-b333-11eb-9976-f64d34f4f7cc.png">
+
 ## Installation
 
 You can install `elastix_napari` via [pip]:
