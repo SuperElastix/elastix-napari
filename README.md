@@ -5,9 +5,11 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/elastix_napari.svg?color=green)](https://python.org)
 [![tests](https://github.com/SuperElastix/elastix_napari/workflows/tests/badge.svg)](https://github.com/SuperElastix/elastix_napari/actions)
 [![codecov](https://codecov.io/gh/SuperElastix/elastix_napari/branch/main/graph/badge.svg)](https://codecov.io/gh/SuperElastix/elastix_napari)
+[![Youtube](https://img.shields.io/badge/YouTube-Demo-red)](https://www.youtube.com/watch?v=GzbP-qUR034)
 
 The [napari] plugin for [elastix], a toolbox for rigid and nonrigid registration of images, based on [itk-elastix].
 
+For a demo video see [youtube] channel.
 For tutorials on how to use elastix, see our [Jupyter notebooks].
 
 To find parameters that work well with specific datasets, see the [elastix Model Zoo].
@@ -47,3 +49,4 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [itk-elastix]: https://github.com/InsightSoftwareConsortium/ITKElastix
 [elastix Model Zoo]: https://elastix.lumc.nl/modelzoo/
 [Jupyter notebooks]: https://mybinder.org/v2/gh/InsightSoftwareConsortium/ITKElastix/master?urlpath=lab/tree/examples%2FITK_Example01_SimpleRegistration.ipynb
+[youtube]: https://www.youtube.com/watch?v=GzbP-qUR034
