@@ -1,13 +1,5 @@
-"""
-This module is an example of a barebones function plugin for napari
-
-It implements the ``napari_experimental_provide_function`` hook specification.
-see: https://napari.org/docs/dev/plugins/hook_specifications.html
-
-Replace code below according to your needs.
-"""
 from typing import TYPE_CHECKING
-
+import elastix_napari.utils as utils
 from enum import Enum
 import numpy as np
 from napari_plugin_engine import napari_hook_implementation
@@ -15,27 +7,13 @@ from magicgui import magic_factory
 import itk
 from pathlib import Path
 from typing import Sequence
-from qtpy.QtWidgets import QMessageBox
-
-
-def error(message):
-    e = QMessageBox()
-    label = QMessageBox()
-    e.setText(message)
-    e.setIcon(QMessageBox.Critical)
-    e.setWindowTitle("Error")
-    e.show()
-    return e
-
-
-def check_pointset(pointset):
-    if '.txt' in str(pointset[0]) or '.vtk' in str(pointset[0]):
-        return True
-    else:
-        return False
 
 
 def on_init(widget):
+    """
+    Initializes widget layout.
+    Updates widget layout according to user input.
+    """
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
 
     for x in ['fixed_mask', 'moving_mask', 'param1', 'param2', 'param3',
@@ -119,24 +97,26 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                          max_step_length: float = 1.0,  masks: bool = False,
                          advanced: bool = False
                          ) -> 'napari.types.LayerDataTuple':
-
+    """
+    Takes user input and calls elastix' registration function in itkelastix.
+    """
     if fixed is None or moving is None:
         print("No images selected for registration.")
-        return error("No images selected for registration.")
-    if check_pointset(fixed_ps) != check_pointset(moving_ps):
+        return utils.error("No images selected for registration.")
+    if utils.check_filename(fixed_ps) != utils.check_filename(moving_ps):
         print("Select both fixed and moving point set.")
-        return error("Select both fixed and moving point set.")
+        return utils.error("Select both fixed and moving point set.")
 
     if advanced:
-        if check_pointset(init_trans):
+        if utils.check_filename(init_trans):
             init_trans = str(init_trans[0])
         else:
             init_trans = ''
-        if check_pointset(fixed_ps):
+        if utils.check_filename(fixed_ps):
             fixed_ps = str(fixed_ps[0])
         else:
             fixed_ps = ''
-        if check_pointset(moving_ps):
+        if utils.check_filename(moving_ps):
             moving_ps = str(moving_ps[0])
         else:
             moving_ps = ''
@@ -158,7 +138,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
                 try:
                     parameter_object.AddParameterFile(par)
                 except:
-                    return error("Parameter file not found or not valid")
+                    return utils.error("Parameter file not found or not valid")
             else:
                 pass
     else:
@@ -192,7 +172,7 @@ def elastix_registration(fixed: 'napari.types.ImageData',
     elif masks:
         if fixed_mask is None and moving_mask is None:
             print("No masks selected for registration")
-            return error("No masks selected for registration")
+            return utils.error("No masks selected for registration")
         else:
             # Casting to numpy and itk is currently necessary
             # because of napari's type ambiguity.
