@@ -3,3 +3,5 @@ numpy>=1.19.0
 napari>=0.4.6
 napari-plugin-engine>=0.1.4
 magicgui>=0.2.6
+itk_napari_conversion>=0.3.1
+napari-itk-io>=0.1.0

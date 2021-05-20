@@ -4,6 +4,8 @@ import itk
 from elastix_napari import elastix_registration
 import numpy as np
 from qtpy.QtWidgets import QMessageBox
+from itk_napari_conversion import image_layer_from_image
+from itk_napari_conversion import image_from_image_layer
 
 
 # Test widget function
@@ -33,6 +35,7 @@ def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
     if artefact:
         image[-10:, :] = 1
     image = itk.image_view_from_array(image)
+    image = image_layer_from_image(image)
     return image
 
 
@@ -45,8 +48,8 @@ def get_er(*args, **kwargs):
 def test_registration():
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
-    result_image = get_er(fixed_image, moving_image, preset='rigid')[0]
-    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+    result_image = get_er(fixed_image, moving_image, preset='rigid')
+    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.001
 
 
@@ -61,11 +64,11 @@ def test_masked_registration():
 
     result_image = get_er(fixed=fixed_image, moving=moving_image,
                           fixed_mask=fixed_mask, moving_mask=moving_mask,
-                          preset='rigid', masks=True)[0]
+                          preset='rigid', masks=True)
 
     # Filter artifacts out of the images.
-    masked_fixed_image = np.asarray(fixed_image)[0:90, 0:90]
-    masked_result_image = result_image[0:90, 0:90]
+    masked_fixed_image = np.asarray(image_from_image_layer(fixed_image))[0:90, 0:90]
+    masked_result_image = np.asarray(image_from_image_layer(result_image))[0:90, 0:90]
 
     mean_diff = np.absolute(np.subtract(masked_fixed_image,
                                         masked_result_image)).mean()
@@ -85,9 +88,9 @@ def test_pointset_registration(data_dir):
 
     result_image = get_er(fixed_image, moving_image, fixed_ps=fixed_ps,
                           moving_ps=moving_ps, preset='rigid',
-                          advanced=True)[0]
+                          advanced=True)
 
-    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.001
 
 
@@ -99,9 +102,9 @@ def test_custom_registration(data_dir):
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
                           param1=(str(data_dir / filename), 'x'),
-                          param2=(str(data_dir / filename), 'x'))[0]
+                          param2=(str(data_dir / filename), 'x'))
 
-    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.01
 
 
@@ -113,8 +116,8 @@ def test_initial_transform(data_dir):
     result_image = get_er(
         fixed_image, moving_image, preset='rigid',
         init_trans=(str(data_dir / init_trans_filename), 'x'), resolutions=6,
-        max_iterations=500, advanced=True)[0]
-    mean_diff = np.absolute(np.subtract(result_image, fixed_image)).mean()
+        max_iterations=500, advanced=True)
+    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.01
 
 
