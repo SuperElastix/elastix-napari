@@ -49,7 +49,9 @@ def test_registration():
     fixed_image = image_generator(25, 75, 25, 75)
     moving_image = image_generator(1, 51, 10, 60)
     result_image = get_er(fixed_image, moving_image, preset='rigid')
-    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
+    mean_diff = np.absolute(np.subtract(
+        np.asarray(image_from_image_layer(result_image)),
+        np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.001
 
 
@@ -67,8 +69,10 @@ def test_masked_registration():
                           preset='rigid', masks=True)
 
     # Filter artifacts out of the images.
-    masked_fixed_image = np.asarray(image_from_image_layer(fixed_image))[0:90, 0:90]
-    masked_result_image = np.asarray(image_from_image_layer(result_image))[0:90, 0:90]
+    masked_fixed_image = np.asarray(
+        image_from_image_layer(fixed_image))[0:90, 0:90]
+    masked_result_image = np.asarray(
+        image_from_image_layer(result_image))[0:90, 0:90]
 
     mean_diff = np.absolute(np.subtract(masked_fixed_image,
                                         masked_result_image)).mean()
@@ -90,7 +94,9 @@ def test_pointset_registration(data_dir):
                           moving_ps=moving_ps, preset='rigid',
                           advanced=True)
 
-    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
+    mean_diff = np.absolute(np.subtract(
+        np.asarray(image_from_image_layer(result_image)),
+        np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.001
 
 
@@ -104,7 +110,9 @@ def test_custom_registration(data_dir):
                           param1=(str(data_dir / filename), 'x'),
                           param2=(str(data_dir / filename), 'x'))
 
-    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
+    mean_diff = np.absolute(np.subtract(
+        np.asarray(image_from_image_layer(result_image)),
+        np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.01
 
 
@@ -117,7 +125,9 @@ def test_initial_transform(data_dir):
         fixed_image, moving_image, preset='rigid',
         init_trans=(str(data_dir / init_trans_filename), 'x'), resolutions=6,
         max_iterations=500, advanced=True)
-    mean_diff = np.absolute(np.subtract(np.asarray(image_from_image_layer(result_image)), np.asarray(image_from_image_layer(fixed_image)))).mean()
+    mean_diff = np.absolute(np.subtract(
+        np.asarray(image_from_image_layer(result_image)),
+        np.asarray(image_from_image_layer(fixed_image)))).mean()
     assert mean_diff < 0.01
 
 
