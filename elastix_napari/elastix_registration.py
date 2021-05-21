@@ -98,7 +98,7 @@ def elastix_registration(fixed: 'napari.layers.Image',
                          nr_spatial_samples: int = 512,
                          max_step_length: float = 1.0,  masks: bool = False,
                          advanced: bool = False
-                         ) -> 'napari.types.LayerDataTuple':
+                         ) -> 'napari.layers.Image':
     """
     Takes user input and calls elastix' registration function in itkelastix.
     """
@@ -127,16 +127,11 @@ def elastix_registration(fixed: 'napari.layers.Image',
         fixed_ps = ''
         moving_ps = ''
 
-    # Casting to numpy is currently necessary
-    # because of napari's type ambiguity.
-    print(type(fixed))
-    print(fixed.metadata)
-    print(fixed.translate)
+    # Convert image layer to itk_image
     fixed = image_from_image_layer(fixed)
     moving = image_from_image_layer(moving)
-    print(type(fixed))
-    # fixed = np.asarray(fixed).astype(np.float32)
-    # moving = np.asarray(moving).astype(np.float32)
+    fixed = fixed.astype(itk.F)
+    moving = moving.astype(itk.F)
 
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
@@ -225,8 +220,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
                     initial_transform_parameter_file_name=init_trans,
                     log_to_console=False)
 
-    return image_layer_from_image(result_image)
-    # return np.asarray(result_image).astype(np.float32), {'name': preset + ' Registration'}
+    layer = image_layer_from_image(result_image)
+    layer.name = preset + " Registration"
+    return layer
 
 
 @napari_hook_implementation
