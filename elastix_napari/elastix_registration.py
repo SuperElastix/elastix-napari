@@ -88,8 +88,8 @@ def on_init(widget):
                                    'samples to use'})
 def elastix_registration(fixed: 'napari.layers.Image',
                          moving: 'napari.layers.Image', preset: str,
-                         fixed_mask: 'napari.types.ImageData',
-                         moving_mask: 'napari.types.ImageData',
+                         fixed_mask: 'napari.layers.Image',
+                         moving_mask: 'napari.layers.Image',
                          fixed_ps: Sequence[Path], moving_ps: Sequence[Path],
                          param1: Sequence[Path], param2: Sequence[Path],
                          param3: Sequence[Path], init_trans: Sequence[Path],
@@ -177,14 +177,12 @@ def elastix_registration(fixed: 'napari.layers.Image',
             print("No masks selected for registration")
             return utils.error("No masks selected for registration")
         else:
-            # Casting to numpy and itk is currently necessary
-            # because of napari's type ambiguity.
-
             if moving_mask is None:
-                # fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
-                # fixed_mask = itk.image_view_from_array(fixed_mask)
-
+                # Convert mask layer to itk_image
                 fixed_mask = image_from_image_layer(fixed_mask)
+                fixed_mask = fixed_mask.astype(itk.UC)
+
+                # Call elastix
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, fixed_mask=fixed_mask,
                     fixed_point_set_file_name=fixed_ps,
@@ -193,10 +191,11 @@ def elastix_registration(fixed: 'napari.layers.Image',
                     log_to_console=False)
 
             elif fixed_mask is None:
-                # moving_mask = np.asarray(moving_mask).astype(np.uint8)
-                # moving_mask = itk.image_view_from_array(moving_mask)
+                # Convert mask layer to itk_image
                 moving_mask = image_from_image_layer(moving_mask)
+                moving_mask = moving_mask.astype(itk.UC)
 
+                # Call elastix
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, moving_mask=moving_mask,
                     fixed_point_set_file_name=fixed_ps,
@@ -204,14 +203,13 @@ def elastix_registration(fixed: 'napari.layers.Image',
                     initial_transform_parameter_file_name=init_trans,
                     log_to_console=False)
             else:
-                # fixed_mask = np.asarray(fixed_mask).astype(np.uint8)
-                # fixed_mask = itk.image_view_from_array(fixed_mask)
+                # Convert mask layer to itk_image
                 fixed_mask = image_from_image_layer(fixed_mask)
+                fixed_mask = fixed_mask.astype(itk.UC)
                 moving_mask = image_from_image_layer(moving_mask)
+                moving_mask = moving_mask.astype(itk.UC)
 
-                # moving_mask = np.asarray(moving_mask).astype(np.uint8)
-                # moving_mask = itk.image_view_from_array(moving_mask)
-
+                # Call elastix
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, fixed_mask=fixed_mask,
                     moving_mask=moving_mask,
