@@ -64,6 +64,7 @@ def on_init(widget):
                preset={"choices": ["rigid", "affine", "bspline", "custom"],
                        "tooltip": "Select a preset parameter file or select "
                        "the 'custom' option to load a custom one"},
+               fixed_mask={'bind': None}, moving_mask={'bind': None},
                fixed_ps={"label": "fixed point set", "filter": "*.txt",
                          "tooltip": "Load a fixed point set"},
                moving_ps={"label": "moving point set", "filter": "*.txt",
@@ -160,7 +161,7 @@ def elastix_registration(fixed: 'napari.layers.Image',
             parameter_map['NumberOfSpatialSamples'] = [str(nr_spatial_samples)]
             parameter_map['MaximumNumberOfIterations'] = [str(max_iterations)]
         else:
-            parameter_map = parameter_object.GetDefaultParameterMap(preset)
+            parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
         parameter_object.AddParameterMap(parameter_map)
 
     if not masks:

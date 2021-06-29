@@ -3,8 +3,6 @@
 This plugin makes the elastix toolbox for rigid and nonrigid registration of images available in napari.
 elastix is open source software, based on the well-known Insight Segmentation and Registration Toolkit (ITK). The software consists of a collection of algorithms that are commonly used to solve (medical) image registration problems. The modular design of elastix allows the user to quickly configure, test, and compare different registration methods for a specific application.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/GzbP-qUR034" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 # Who is This For?
 
 With this plugin both 2D and 3D images in all file formats available in ITK can be registered.
