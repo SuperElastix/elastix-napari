@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Sequence
 from itk_napari_conversion import image_from_image_layer
 from itk_napari_conversion import image_layer_from_image
+import napari.types
 
 
 def on_init(widget):
