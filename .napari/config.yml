@@ -3,3 +3,14 @@ project_urls:
     Bug Tracker: https://github.com/SuperElastix/elastix_napari/issues
     Source Code: https://github.com/SuperElastix/elastix_napari
     User Support: https://groups.google.com/g/elastix-imageregistration
+# Add labels from the EDAM Bioimaging ontology
+labels:
+  ontology: EDAM-BIOIMAGING:alpha06
+  terms:
+  - Rigid registration
+  - Deformable registration
+  - Affine registration
+  - 2D image
+  - 3D image
+  - Image segmentation
+  - Medical imaging
