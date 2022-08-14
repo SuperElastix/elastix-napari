@@ -61,5 +61,11 @@ setup(
         'Operating System :: OS Independent',
         'License :: OSI Approved :: Apache Software License',
     ],
+    project_urls={
+        'Project Site': 'https://elastix.lumc.nl/',
+        'Bug Tracker': 'https://github.com/SuperElastix/elastix_napari/issues',
+        'Source Code': 'https://github.com/SuperElastix/elastix_napari',
+        'User Support': 'https://groups.google.com/g/elastix-imageregistration',
+    },
     entry_points={'napari.plugin': 'itk-elastix_napari = elastix_napari'},
 )
