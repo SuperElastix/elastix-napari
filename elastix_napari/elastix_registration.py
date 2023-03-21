@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Sequence
 from itk_napari_conversion import image_from_image_layer
 from itk_napari_conversion import image_layer_from_image
-import napari.types
+# import napari.types
 
 
 def on_init(widget):
@@ -25,12 +25,14 @@ def on_init(widget):
               'max_step_length']:
         setattr(getattr(widget, x), 'visible', False)
 
-    def toggle_mask_widgets(event):
+    @widget.masks.changed.connect
+    def toggle_mask_widgets(value):
         for x in ['fixed_mask', 'moving_mask']:
-            setattr(getattr(widget, x), 'visible', event.value)
+            setattr(getattr(widget, x), 'visible', value)
 
-    def toggle_preset_widget(event):
-        if event.value == "custom":
+    @widget.preset.changed.connect
+    def toggle_preset_widget(value):
+        if value == "custom":
             for x in ['param1', 'param2', 'param3']:
                 setattr(getattr(widget, x), 'visible', True)
             for y in ['metric', 'resolutions', 'max_iterations',
@@ -45,19 +47,17 @@ def on_init(widget):
                       'fixed_ps']:
                 setattr(getattr(widget, x), 'visible', widget.advanced.value)
 
-    def toggle_advanced_widget(event):
+    @widget.advanced.changed.connect
+    def toggle_advanced_widget(value):
         if widget.preset.value == "custom":
             for x in ['init_trans', 'fixed_ps', 'moving_ps']:
-                setattr(getattr(widget, x), 'visible', event.value)
+                setattr(getattr(widget, x), 'visible', value)
         else:
             for x in ['metric', 'init_trans', 'resolutions',
                       'max_iterations', 'nr_spatial_samples',
                       'max_step_length', 'fixed_ps', 'moving_ps']:
-                setattr(getattr(widget, x), 'visible', event.value)
+                setattr(getattr(widget, x), 'visible', value)
 
-    widget.preset.changed.connect(toggle_preset_widget)
-    widget.masks.changed.connect(toggle_mask_widgets)
-    widget.advanced.changed.connect(toggle_advanced_widget)
     widget.native.layout().addStretch()
 
 
@@ -228,3 +228,4 @@ def elastix_registration(fixed: 'napari.layers.Image',
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     return elastix_registration
+
