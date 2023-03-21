@@ -105,10 +105,8 @@ def elastix_registration(fixed: 'napari.layers.Image',
     Takes user input and calls elastix' registration function in itkelastix.
     """
     if fixed is None or moving is None:
-        print("No images selected for registration.")
         return utils.error("No images selected for registration.")
     if utils.check_filename(fixed_ps) != utils.check_filename(moving_ps):
-        print("Select both fixed and moving point set.")
         return utils.error("Select both fixed and moving point set.")
 
     if advanced:
@@ -176,7 +174,6 @@ def elastix_registration(fixed: 'napari.layers.Image',
 
     elif masks:
         if fixed_mask is None and moving_mask is None:
-            print("No masks selected for registration")
             return utils.error("No masks selected for registration")
         else:
             if moving_mask is None:
