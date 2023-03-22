@@ -1,15 +1,16 @@
 from typing import TYPE_CHECKING
 import elastix_napari.utils as utils
-from enum import Enum
-import numpy as np
 from napari_plugin_engine import napari_hook_implementation
 from magicgui import magic_factory
 import itk
 from pathlib import Path
 from itk_napari_conversion import image_from_image_layer
 from itk_napari_conversion import image_layer_from_image
-# import napari.types
 
+# For IDE type support and autocompletion
+# https://napari.org/stable/guides/magicgui.html?highlight=type_checking
+if TYPE_CHECKING:
+    import napari
 
 def on_init(widget):
     """
