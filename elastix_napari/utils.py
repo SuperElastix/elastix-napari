@@ -18,7 +18,7 @@ def check_filename(filename):
     """
     Checks if filename adheres to the correct format.
     """
-    if '.txt' in str(filename[0]) or '.vtk' in str(filename[0]):
+    if (filename.suffix == '.txt') or (filename.suffix == '.vtk'):
         return True
     else:
         return False

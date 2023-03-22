@@ -6,7 +6,6 @@ from napari_plugin_engine import napari_hook_implementation
 from magicgui import magic_factory
 import itk
 from pathlib import Path
-from typing import Sequence
 from itk_napari_conversion import image_from_image_layer
 from itk_napari_conversion import image_layer_from_image
 # import napari.types
@@ -92,9 +91,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
                          moving: 'napari.layers.Image', preset: str,
                          fixed_mask: 'napari.layers.Image',
                          moving_mask: 'napari.layers.Image',
-                         fixed_ps: Sequence[Path], moving_ps: Sequence[Path],
-                         param1: Sequence[Path], param2: Sequence[Path],
-                         param3: Sequence[Path], init_trans: Sequence[Path],
+                         fixed_ps: Path, moving_ps: Path,
+                         param1: Path, param2: Path,
+                         param3: Path, init_trans: Path,
                          metric: str = "AdvancedMattesMutualInformation",
                          resolutions: int = 4, max_iterations: int = 500,
                          nr_spatial_samples: int = 512,
@@ -106,25 +105,14 @@ def elastix_registration(fixed: 'napari.layers.Image',
     """
     if fixed is None or moving is None:
         return utils.error("No images selected for registration.")
-    if utils.check_filename(fixed_ps) != utils.check_filename(moving_ps):
+    if fixed_ps.exists() != moving_ps.exists():
         return utils.error("Select both fixed and moving point set.")
 
-    if advanced:
-        if utils.check_filename(init_trans):
-            init_trans = str(init_trans[0])
-        else:
-            init_trans = ''
-        if utils.check_filename(fixed_ps):
-            fixed_ps = str(fixed_ps[0])
-        else:
-            fixed_ps = ''
-        if utils.check_filename(moving_ps):
-            moving_ps = str(moving_ps[0])
-        else:
-            moving_ps = ''
-    else:
+    if not utils.check_filename(init_trans):
         init_trans = ''
+    if not utils.check_filename(fixed_ps):
         fixed_ps = ''
+    if not utils.check_filename(moving_ps):
         moving_ps = ''
 
     # Convert image layer to itk_image
@@ -135,11 +123,10 @@ def elastix_registration(fixed: 'napari.layers.Image',
 
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
-        for par_sequence in [param1, param2, param3]:
-            par = str(par_sequence[0])
-            if ".txt" in par:
+        for par in [param1, param2, param3]:
+            if par.suffix == ".txt":
                 try:
-                    parameter_object.AddParameterFile(par)
+                    parameter_object.AddParameterFile(str(par))
                 except:
                     return utils.error("Parameter file not found or not valid")
             else:
@@ -149,7 +136,7 @@ def elastix_registration(fixed: 'napari.layers.Image',
             parameter_map = \
                 parameter_object.GetDefaultParameterMap(preset, resolutions)
             parameter_map['Metric'] = [metric]
-            if fixed_ps != '' and moving_ps != '':
+            if str(fixed_ps) != '' and str(moving_ps) != '':
                 parameter_map['Registration'] = [
                     'MultiMetricMultiResolutionRegistration']
                 original_metric = parameter_map['Metric']
@@ -167,9 +154,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
         result_image, result_transform_parameters = \
             itk.elastix_registration_method(
                 fixed, moving, parameter_object,
-                fixed_point_set_file_name=fixed_ps,
-                moving_point_set_file_name=moving_ps,
-                initial_transform_parameter_file_name=init_trans,
+                fixed_point_set_file_name=str(fixed_ps),
+                moving_point_set_file_name=str(moving_ps),
+                initial_transform_parameter_file_name=str(init_trans),
                 log_to_console=True)
 
     elif masks:
@@ -184,9 +171,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
                 # Call elastix
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, fixed_mask=fixed_mask,
-                    fixed_point_set_file_name=fixed_ps,
-                    moving_point_set_file_name=moving_ps,
-                    initial_transform_parameter_file_name=init_trans,
+                    fixed_point_set_file_name=str(fixed_ps),
+                    moving_point_set_file_name=str(moving_ps),
+                    initial_transform_parameter_file_name=str(init_trans),
                     log_to_console=False)
 
             elif fixed_mask is None:
@@ -197,9 +184,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
                 # Call elastix
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, moving_mask=moving_mask,
-                    fixed_point_set_file_name=fixed_ps,
-                    moving_point_set_file_name=moving_ps,
-                    initial_transform_parameter_file_name=init_trans,
+                    fixed_point_set_file_name=str(fixed_ps),
+                    moving_point_set_file_name=str(moving_ps),
+                    initial_transform_parameter_file_name=str(init_trans),
                     log_to_console=False)
             else:
                 # Convert mask layer to itk_image
@@ -212,9 +199,9 @@ def elastix_registration(fixed: 'napari.layers.Image',
                 result_image, rtp = itk.elastix_registration_method(
                     fixed, moving, parameter_object, fixed_mask=fixed_mask,
                     moving_mask=moving_mask,
-                    fixed_point_set_file_name=fixed_ps,
-                    moving_point_set_file_name=moving_ps,
-                    initial_transform_parameter_file_name=init_trans,
+                    fixed_point_set_file_name=str(fixed_ps),
+                    moving_point_set_file_name=str(moving_ps),
+                    initial_transform_parameter_file_name=str(init_trans),
                     log_to_console=False)
 
     layer = image_layer_from_image(result_image)
