@@ -28,7 +28,7 @@ def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
         point_set.write(str(x2) + " " + str(y1) + "\n")
         point_set.write(str(x2) + " " + str(y2) + "\n")
         point_set.close()
-        return (str(data_dir / filename), 'x')
+        return data_dir / filename
     else:
         image = np.zeros([100, 100], np.float32)
     image[y1:y2, x1:x2] = 1
@@ -107,8 +107,8 @@ def test_custom_registration(data_dir):
 
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
-                          param1=(str(data_dir / filename), 'x'),
-                          param2=(str(data_dir / filename), 'x'))
+                          param1=data_dir / filename,
+                          param2=data_dir / filename)
 
     mean_diff = np.absolute(np.subtract(
         np.asarray(image_from_image_layer(result_image)),
@@ -123,7 +123,7 @@ def test_initial_transform(data_dir):
     init_trans_filename = "TransformParameters.0.txt"
     result_image = get_er(
         fixed_image, moving_image, preset='rigid',
-        init_trans=(str(data_dir / init_trans_filename), 'x'), resolutions=6,
+        init_trans=data_dir / init_trans_filename, resolutions=6,
         max_iterations=500, advanced=True)
     mean_diff = np.absolute(np.subtract(
         np.asarray(image_from_image_layer(result_image)),
