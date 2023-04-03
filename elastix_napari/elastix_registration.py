@@ -88,8 +88,8 @@ def on_init(widget):
                nr_spatial_samples={"max": 8192, "step": 256,
                                    "tooltip": 'Select the number of spatial '
                                    'samples to use'})
-def elastix_registration(fixed: 'napari.layers.Image',
-                         moving: 'napari.layers.Image', preset: str,
+def elastix_registration(fixed_image: 'napari.layers.Image',
+                         moving_image: 'napari.layers.Image', preset: str,
                          fixed_mask: 'napari.layers.Image',
                          moving_mask: 'napari.layers.Image',
                          fixed_ps: Path, moving_ps: Path,
@@ -104,7 +104,7 @@ def elastix_registration(fixed: 'napari.layers.Image',
     """
     Takes user input and calls elastix' registration function in itkelastix.
     """
-    if fixed is None or moving is None:
+    if fixed_image is None or moving_image is None:
         return utils.error("No images selected for registration.")
     if fixed_ps.exists() != moving_ps.exists():
         return utils.error("Select both fixed and moving point set.")
@@ -117,10 +117,10 @@ def elastix_registration(fixed: 'napari.layers.Image',
         moving_ps = ''
 
     # Convert image layer to itk_image
-    fixed = image_from_image_layer(fixed)
-    moving = image_from_image_layer(moving)
-    fixed = fixed.astype(itk.F)
-    moving = moving.astype(itk.F)
+    fixed_image = image_from_image_layer(fixed_image)
+    moving_image = image_from_image_layer(moving_image)
+    fixed_image = fixed_image.astype(itk.F)
+    moving_image = moving_image.astype(itk.F)
 
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
@@ -151,8 +151,8 @@ def elastix_registration(fixed: 'napari.layers.Image',
             parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
         parameter_object.AddParameterMap(parameter_map)
 
-    kwargs = {"fixed_image": fixed,
-              "moving_image": moving,
+    kwargs = {"fixed_image": fixed_image,
+              "moving_image": moving_image,
               "parameter_object": parameter_object,
               "fixed_point_set_file_name": str(fixed_ps),
               "moving_point_set_file_name": str(moving_ps),

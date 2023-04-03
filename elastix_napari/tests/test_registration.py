@@ -64,7 +64,7 @@ def test_masked_registration():
     fixed_mask = image_generator(0, 100, 0, 90, mask=True)
     moving_mask = image_generator(0, 100, 0, 90, mask=True)
 
-    result_image = get_er(fixed=fixed_image, moving=moving_image,
+    result_image = get_er(fixed_image=fixed_image, moving_image=moving_image,
                           fixed_mask=fixed_mask, moving_mask=moving_mask,
                           preset='rigid', masks=True)
 
