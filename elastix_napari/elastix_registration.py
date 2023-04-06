@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 import elastix_napari.utils as utils
-from napari_plugin_engine import napari_hook_implementation
 from magicgui import magic_factory
 import itk
 from pathlib import Path
@@ -181,8 +180,4 @@ def elastix_registration(fixed_image: 'napari.layers.Image',
     layer.name = preset + " Registration"
     return layer
 
-
-@napari_hook_implementation
-def napari_experimental_provide_dock_widget():
-    return elastix_registration
 

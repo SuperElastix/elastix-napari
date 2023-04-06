@@ -1,0 +1,10 @@
+name: elastix-napari
+schema_version: 0.2.0
+contributions:
+  commands:
+  - id: elastix-napari.elastix_registration
+    title: Create elastix_registration
+    python_name: elastix_napari.elastix_registration:elastix_registration
+  widgets:
+  - command: elastix-napari.elastix_registration
+    display_name: elastix_registration

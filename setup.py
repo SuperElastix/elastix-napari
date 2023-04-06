@@ -67,5 +67,6 @@ setup(
         'Source Code': 'https://github.com/SuperElastix/elastix_napari',
         'User Support': 'https://groups.google.com/g/elastix-imageregistration',
     },
-    entry_points={'napari.plugin': 'itk-elastix_napari = elastix_napari'},
+    entry_points={'napari.manifest': ['elastix-napari = elastix_napari:napari.yaml']},
+    package_data={'elastix_napari': ['napari.yaml']}
 )
