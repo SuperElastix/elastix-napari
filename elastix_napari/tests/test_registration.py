@@ -6,7 +6,8 @@ import numpy as np
 from qtpy.QtWidgets import QMessageBox
 from itk_napari_conversion import image_layer_from_image
 from itk_napari_conversion import image_from_image_layer
-
+import tempfile
+from pathlib import Path
 
 # Helper functions
 def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
@@ -137,3 +138,23 @@ def test_empty_masks():
     im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None,
                 preset='rigid', masks=True)
     assert isinstance(im, QMessageBox)
+
+def test_empty_output_dir():
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+    im = get_er(fixed_image, moving_image, preset='rigid', save_output=True)
+    assert isinstance(im, QMessageBox)
+
+def test_writing_result():
+
+    fixed_image = image_generator(25, 75, 25, 75)
+    moving_image = image_generator(1, 51, 10, 60)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdir = Path(tmpdirname)
+        im = get_er(fixed_image, moving_image, preset='rigid', save_output=True,
+                    output_dir=tmpdir)
+        assert (tmpdir / "TransformParameters.0.txt").exists()
+    
+
+
