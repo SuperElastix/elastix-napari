@@ -21,7 +21,7 @@ def on_init(widget):
     for x in ['fixed_mask', 'moving_mask', 'param1', 'param2', 'param3',
               'fixed_ps', 'moving_ps', 'metric', 'init_trans',
               'resolutions', 'max_iterations', 'nr_spatial_samples',
-              'max_step_length']:
+              'max_step_length', 'output_dir']:
         setattr(getattr(widget, x), 'visible', False)
 
     @widget.masks.changed.connect
@@ -45,6 +45,11 @@ def on_init(widget):
                       'nr_spatial_samples', 'max_step_length', 'moving_ps',
                       'fixed_ps']:
                 setattr(getattr(widget, x), 'visible', widget.advanced.value)
+
+    @widget.save_output.changed.connect
+    def toggle_save_output_widget(value):
+        setattr(getattr(widget, 'output_dir'), 'visible', value)
+
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
@@ -84,6 +89,8 @@ def on_init(widget):
                init_trans={"label": "initial transform", "filter": "*.txt",
                            "tooltip": 'Load a initial transform from a .txt '
                            'file'},
+               output_dir={"label": "output directory", "mode": "d",
+                           "tooltip": "Specify output directory to store the results"},
                nr_spatial_samples={"max": 8192, "step": 256,
                                    "tooltip": 'Select the number of spatial '
                                    'samples to use'})
@@ -94,10 +101,12 @@ def elastix_registration(fixed_image: 'napari.layers.Image',
                          fixed_ps: Path, moving_ps: Path,
                          param1: Path, param2: Path,
                          param3: Path, init_trans: Path,
+                         output_dir: Path,
                          metric: str = "AdvancedMattesMutualInformation",
                          resolutions: int = 4, max_iterations: int = 500,
                          nr_spatial_samples: int = 512,
-                         max_step_length: float = 1.0,  masks: bool = False,
+                         max_step_length: float = 1.0,   
+                         masks: bool = False, save_output: bool = False, 
                          advanced: bool = False
                          ) -> 'napari.layers.Image':
     """
@@ -171,6 +180,13 @@ def elastix_registration(fixed_image: 'napari.layers.Image',
                 moving_mask = image_from_image_layer(moving_mask)
                 moving_mask = moving_mask.astype(itk.UC)
                 kwargs["moving_mask"] = moving_mask
+    
+    if save_output:
+        if not output_dir.is_dir() or output_dir == Path():
+            return utils.error("Output directory is not chosen/valid")
+
+        kwargs["output_directory"] = str(output_dir)            
+
 
     # Run elastix registration
     result_image, result_transform_parameters = itk.elastix_registration_method(**kwargs)
