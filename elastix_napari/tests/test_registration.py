@@ -8,11 +8,6 @@ from itk_napari_conversion import image_layer_from_image
 from itk_napari_conversion import image_from_image_layer
 
 
-# Test widget function
-def test_dock_widget():
-    assert elastix_napari.napari_experimental_provide_dock_widget() is not None
-
-
 # Helper functions
 def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
                     pointset=False, ps_name='fixed', data_dir='none'):
