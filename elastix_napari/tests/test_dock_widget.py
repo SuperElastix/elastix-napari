@@ -5,7 +5,7 @@ import pytest
 MY_PLUGIN_NAME = "elastix-napari"
 
 # Names of the widgets
-MY_WIDGET_NAMES = ["elastix_registration"]
+MY_WIDGET_NAMES = ["elastix_registration", "transformix"]
 
 @pytest.mark.parametrize("widget_name", MY_WIDGET_NAMES)
 def test_widget_creation(widget_name, make_napari_viewer, napari_plugin_manager):

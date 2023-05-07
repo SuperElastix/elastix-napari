@@ -5,6 +5,11 @@ contributions:
   - id: elastix-napari.elastix_registration
     title: Create elastix_registration
     python_name: elastix_napari.elastix_registration:elastix_registration
+  - id: elastix-napari.create_transformix_widget
+    title: Create transformix widget
+    python_name: elastix_napari.transformix_widget:create_transformix_widget
   widgets:
   - command: elastix-napari.elastix_registration
     display_name: elastix_registration
+  - command: elastix-napari.create_transformix_widget
+    display_name: transformix
