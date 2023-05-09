@@ -1,10 +1,10 @@
-# elastix_napari
+# elastix-napari
 
-[![License](https://img.shields.io/pypi/l/elastix_napari.svg?color=green)](https://github.com/SuperElastix/elastix_napari/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/elastix_napari.svg?color=green)](https://pypi.org/project/elastix_napari)
-[![Python Version](https://img.shields.io/pypi/pyversions/elastix_napari.svg?color=green)](https://python.org)
-[![tests](https://github.com/SuperElastix/elastix_napari/workflows/tests/badge.svg)](https://github.com/SuperElastix/elastix_napari/actions)
-[![codecov](https://codecov.io/gh/SuperElastix/elastix_napari/branch/main/graph/badge.svg)](https://codecov.io/gh/SuperElastix/elastix_napari)
+[![License](https://img.shields.io/pypi/l/elastix-napari.svg?color=green)](https://github.com/SuperElastix/elastix-napari/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/elastix-napari.svg?color=green)](https://pypi.org/project/elastix-napari)
+[![Python Version](https://img.shields.io/pypi/pyversions/elastix-napari.svg?color=green)](https://python.org)
+[![tests](https://github.com/SuperElastix/elastix-napari/workflows/tests/badge.svg)](https://github.com/SuperElastix/elastix-napari/actions)
+[![codecov](https://codecov.io/gh/SuperElastix/elastix-napari/branch/main/graph/badge.svg)](https://codecov.io/gh/SuperElastix/elastix-napari)
 [![Youtube](https://img.shields.io/badge/YouTube-Demo-red)](https://www.youtube.com/watch?v=GzbP-qUR034)
 
 The [napari] plugin for [elastix], a toolbox for rigid and nonrigid registration of images, based on [itk-elastix].
@@ -18,9 +18,9 @@ To find parameters that work well with specific datasets, see the [elastix Model
 
 ## Installation
 
-You can install `elastix_napari` via [pip]:
+You can install `elastix-napari` via [pip]:
 
-    pip install elastix_napari
+    pip install elastix-napari
 
 ## Contributing
 
@@ -30,7 +30,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [Apache Software License 2.0] license,
-"elastix_napari" is free and open source software
+"elastix-napari" is free and open source software
 
 ## Issues
 
@@ -41,7 +41,7 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [@napari]: https://github.com/napari
 [Apache Software License 2.0]: http://www.apache.org/licenses/LICENSE-2.0
 [cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin
-[file an issue]: https://github.com/SuperElastix/elastix_napari/issues
+[file an issue]: https://github.com/SuperElastix/elastix-napari/issues
 [tox]: https://tox.readthedocs.io/en/latest/
 [pip]: https://pypi.org/project/pip/
 [PyPI]: https://pypi.org/

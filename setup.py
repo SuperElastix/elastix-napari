@@ -35,11 +35,11 @@ with open('requirements.txt') as f:
 use_scm = {"write_to": "elastix_napari/_version.py"}
 
 setup(
-    name='elastix_napari',
+    name='elastix-napari',
     author='Viktor van der Valk',
     author_email='v.o.van_der_valk@lumc.nl',
     license='Apache Software License 2.0',
-    url='https://github.com/SuperElastix/elastix_napari',
+    url='https://github.com/SuperElastix/elastix-napari',
     description='A toolbox for rigid and nonrigid registration of images.',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
@@ -63,8 +63,8 @@ setup(
     ],
     project_urls={
         'Project Site': 'https://elastix.lumc.nl/',
-        'Bug Tracker': 'https://github.com/SuperElastix/elastix_napari/issues',
-        'Source Code': 'https://github.com/SuperElastix/elastix_napari',
+        'Bug Tracker': 'https://github.com/SuperElastix/elastix-napari/issues',
+        'Source Code': 'https://github.com/SuperElastix/elastix-napari',
         'User Support': 'https://groups.google.com/g/elastix-imageregistration',
     },
     entry_points={'napari.manifest': ['elastix-napari = elastix_napari:napari.yaml']},
