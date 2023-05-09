@@ -69,9 +69,9 @@ This is a deformable transformation that preserves none of the properties mentio
 
 # Getting Help
 If you find a bug in the elastix napari plugin, or would like support with using it, please raise an
-issue on the [GitHub repository](https://github.com/SuperElastix/elastix_napari).
+issue on the [GitHub repository](https://github.com/SuperElastix/elastix-napari).
 
 For question specifically about the elastix toolbox we have a [mailing list](https://groups.google.com/forum/#!forum/elastix-imageregistration).
 
 # Contributions
-Contributions to the elastix_napari plugin, [itkelastix](https://github.com/InsightSoftwareConsortium/ITKElastix) (the python wrapper) or [elastix](https://github.com/SuperElastix/elastix) (the C++ core) on which the plugin is build, are welcome.
+Contributions to the elastix-napari plugin, [itkelastix](https://github.com/InsightSoftwareConsortium/ITKElastix) (the python wrapper) or [elastix](https://github.com/SuperElastix/elastix) (the C++ core) on which the plugin is build, are welcome.
