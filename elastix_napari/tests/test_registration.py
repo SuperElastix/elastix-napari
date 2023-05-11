@@ -8,31 +8,6 @@ from itk_napari_conversion import image_layer_from_image
 from itk_napari_conversion import image_from_image_layer
 from pathlib import Path
 
-# Helper functions
-def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
-                    pointset=False, ps_name='fixed', data_dir='none'):
-    if mask:
-        image = np.zeros([100, 100], np.uint8)
-    elif pointset:
-        # Create fixed point set
-        filename = ps_name + "_point_set_test.txt"
-        point_set = open(str(data_dir / filename), "w+")
-        point_set.write("point\n4\n")
-        point_set.write(str(x1) + " " + str(y1) + "\n")
-        point_set.write(str(x1) + " " + str(y2) + "\n")
-        point_set.write(str(x2) + " " + str(y1) + "\n")
-        point_set.write(str(x2) + " " + str(y2) + "\n")
-        point_set.close()
-        return data_dir / filename
-    else:
-        image = np.zeros([100, 100], np.float32)
-    image[y1:y2, x1:x2] = 1
-    if artefact:
-        image[-10:, :] = 1
-    image = itk.image_view_from_array(image)
-    image = image_layer_from_image(image)
-    return image
-
 
 def get_er(*args, **kwargs):
     er_func = elastix_registration.elastix_registration()
@@ -40,9 +15,8 @@ def get_er(*args, **kwargs):
 
 
 # Test normal registration
-def test_registration():
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
+# @pytest.mark.parametrize("fixed_image, moving_image", [(fixed_image_2D, moving_image_2D),])
+def test_registration(fixed_image, moving_image):
     result_image = get_er(fixed_image, moving_image, preset='rigid')
     mean_diff = np.absolute(np.subtract(
         np.asarray(image_from_image_layer(result_image)),
@@ -51,15 +25,8 @@ def test_registration():
 
 
 # Test Masked registration
-def test_masked_registration():
-    fixed_image = image_generator(25, 75, 25, 75, artefact=True)
-    moving_image = image_generator(1, 51, 10, 60, artefact=True)
-
-    # Create mask for artefact
-    fixed_mask = image_generator(0, 100, 0, 90, mask=True)
-    moving_mask = image_generator(0, 100, 0, 90, mask=True)
-
-    result_image = get_er(fixed_image=fixed_image, moving_image=moving_image,
+def test_masked_registration(fixed_image, moving_image, fixed_mask, moving_mask):
+    result_image = get_er(fixed_image, moving_image,
                           fixed_mask=fixed_mask, moving_mask=moving_mask,
                           preset='rigid', masks=True)
 
@@ -75,16 +42,7 @@ def test_masked_registration():
 
 
 # Test Point set registration
-def test_pointset_registration(data_dir):
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
-
-    # Create pointsets for artefact
-    fixed_ps = image_generator(25, 75, 25, 75, pointset=True, ps_name='fixed',
-                               data_dir=data_dir)
-    moving_ps = image_generator(1, 51, 10, 60, pointset=True, ps_name='moving',
-                                data_dir=data_dir)
-
+def test_pointset_registration(fixed_image, moving_image, fixed_ps, moving_ps):
     result_image = get_er(fixed_image, moving_image, fixed_ps=fixed_ps,
                           moving_ps=moving_ps, preset='rigid',
                           advanced=True)
@@ -96,10 +54,7 @@ def test_pointset_registration(data_dir):
 
 
 # Test registration with custom parameter textfiles
-def test_custom_registration(data_dir):
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
-
+def test_custom_registration(fixed_image, moving_image, data_dir):
     filename = "parameters_Rigid.txt"
     result_image = get_er(fixed_image, moving_image, preset='custom',
                           param1=data_dir / filename,
@@ -111,10 +66,7 @@ def test_custom_registration(data_dir):
     assert mean_diff < 0.01
 
 
-def test_initial_transform(data_dir):
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
-
+def test_initial_transform(fixed_image, moving_image, data_dir):
     init_trans_filename = "TransformParameters.0.txt"
     result_image = get_er(
         fixed_image, moving_image, preset='rigid',
@@ -131,24 +83,16 @@ def test_empty_images():
     assert isinstance(im, QMessageBox)
 
 
-def test_empty_masks():
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
+def test_empty_masks(fixed_image, moving_image):
     im = get_er(fixed_image, moving_image, fixed_mask=None, moving_mask=None,
                 preset='rigid', masks=True)
     assert isinstance(im, QMessageBox)
 
-def test_empty_output_dir():
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
+def test_empty_output_dir(fixed_image, moving_image):
     im = get_er(fixed_image, moving_image, preset='rigid', save_output=True)
     assert isinstance(im, QMessageBox)
 
-def test_writing_result(tmpdir):
-
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
-    
+def test_writing_result(fixed_image, moving_image, tmpdir):
     tmpdir = Path(tmpdir)
     im = get_er(fixed_image, moving_image, preset='rigid', save_output=True,
                 output_dir=tmpdir)

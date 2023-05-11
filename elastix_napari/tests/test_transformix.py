@@ -2,15 +2,11 @@ import pytest
 import itk
 import numpy as np
 from elastix_napari import transformix_widget
-from elastix_napari.tests.test_registration import image_generator
 from itk_napari_conversion import image_from_image_layer
 from qtpy.QtWidgets import QMessageBox
 from pathlib import Path
 
-def test_transformation(tmpdir):
-    fixed_image = image_generator(25, 75, 25, 75)
-    moving_image = image_generator(1, 51, 10, 60)
-
+def test_transformation(fixed_image, moving_image, tmpdir):
     parameter_object = itk.ParameterObject.New()
     default_rigid_parameter_map = parameter_object.GetDefaultParameterMap('rigid')
     parameter_object.AddParameterMap(default_rigid_parameter_map)
@@ -35,9 +31,8 @@ def test_empty_image(data_dir):
     assert isinstance(result, QMessageBox)
 
 
-def test_empty_transform_file():
-    image = image_generator(25, 75, 25, 75)
-    result = transformix_widget.create_transformix_widget()(image=image_from_image_layer(image), transform_file=Path())
+def test_empty_transform_file(moving_image):
+    result = transformix_widget.create_transformix_widget()(image=image_from_image_layer(moving_image), transform_file=Path())
     assert isinstance(result, QMessageBox)
 
 
