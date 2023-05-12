@@ -11,32 +11,6 @@ if TYPE_CHECKING:
     import napari
 
 
-# Helper functions
-def image_generator(x1, x2, y1, y2, mask=False, artefact=False,
-                    pointset=False, ps_name='fixed', data_dir='none'):
-    if mask:
-        image = np.zeros([100, 100], np.uint8)
-    elif pointset:
-        # Create fixed point set
-        filename = ps_name + "_point_set_test.txt"
-        point_set = open(str(data_dir / filename), "w+")
-        point_set.write("point\n4\n")
-        point_set.write(str(x1) + " " + str(y1) + "\n")
-        point_set.write(str(x1) + " " + str(y2) + "\n")
-        point_set.write(str(x2) + " " + str(y1) + "\n")
-        point_set.write(str(x2) + " " + str(y2) + "\n")
-        point_set.close()
-        return data_dir / filename
-    else:
-        image = np.zeros([100, 100], np.float32)
-    image[y1:y2, x1:x2] = 1
-    if artefact:
-        image[-10:, :] = 1
-    image = itk.image_view_from_array(image)
-    image = image_layer_from_image(image)
-    return image
-
-
 @pytest.fixture(scope="session")
 def data_dir() -> Path:
     return Path(__file__).parent / "data"
@@ -55,24 +29,28 @@ def moving_image(data_dir) -> 'napari.layers.Image':
     image = image_layer_from_image(image)
     return image
 
+#TODO: Improve mask fixtures
 @pytest.fixture(scope="session")
 def fixed_mask() -> 'napari.layers.Image':
-    return image_generator(0, 100, 0, 90, mask=True)
+    mask = np.zeros([100, 100], np.uint8)
+    mask[:90, :100] = 1
+    mask = itk.image_view_from_array(mask)
+    return image_layer_from_image(mask)    
 
 @pytest.fixture(scope="session")
 def moving_mask() -> 'napari.layers.Image':
-    return image_generator(0, 100, 0, 90, mask=True)
+    mask = np.zeros([100, 100], np.uint8)
+    mask[:90, :100] = 1
+    mask = itk.image_view_from_array(mask)
+    return image_layer_from_image(mask)    
 
 @pytest.fixture(scope="session")
 def fixed_ps(data_dir) -> 'Path':
-    return image_generator(25, 75, 25, 75, pointset=True, ps_name='fixed',
-                               data_dir=data_dir)
+    return data_dir / "fixed_point_set_test.txt"
 
 @pytest.fixture(scope="session")
 def moving_ps(data_dir) -> 'Path':
-    return image_generator(1, 51, 10, 60, pointset=True, ps_name='moving',
-                                data_dir=data_dir)
-
+    return data_dir / "moving_point_set_test.txt"
 
 @pytest.fixture(scope="function")
 def default_rigid() -> 'itk.ParameterObject':

@@ -6,14 +6,10 @@ from itk_napari_conversion import image_from_image_layer
 from qtpy.QtWidgets import QMessageBox
 from pathlib import Path
 
-def test_transformation(fixed_image, moving_image, tmpdir):
-    parameter_object = itk.ParameterObject.New()
-    default_rigid_parameter_map = parameter_object.GetDefaultParameterMap('rigid')
-    parameter_object.AddParameterMap(default_rigid_parameter_map)
-
+def test_transformation(fixed_image, moving_image, default_rigid, tmpdir):
     result_image_elx, result_transform_parameters = itk.elastix_registration_method(image_from_image_layer(fixed_image),
                                                                                     image_from_image_layer(moving_image),
-                                                                                    parameter_object=parameter_object,
+                                                                                    parameter_object=default_rigid,
                                                                                     output_directory=str(tmpdir)
                                                                                     )
 
