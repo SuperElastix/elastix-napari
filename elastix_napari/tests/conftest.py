@@ -43,13 +43,17 @@ def data_dir() -> Path:
 
 @pytest.fixture(scope="session")
 # def fixed_image_2D() -> 'napari.layers.Image':
-def fixed_image() -> 'napari.layers.Image':
-    return image_generator(25, 75, 25, 75)
+def fixed_image(data_dir) -> 'napari.layers.Image':
+    image = itk.imread(str(data_dir / "CT_2D_head_fixed.mha"), itk.F)
+    image = image_layer_from_image(image)
+    return image
 
 @pytest.fixture(scope="session")
 # def moving_image_2D() -> 'napari.layers.Image':
-def moving_image() -> 'napari.layers.Image':
-    return image_generator(1, 51, 10, 60)
+def moving_image(data_dir) -> 'napari.layers.Image':
+    image = itk.imread(str(data_dir / "CT_2D_head_moving.mha"), itk.F)
+    image = image_layer_from_image(image)
+    return image
 
 @pytest.fixture(scope="session")
 def fixed_mask() -> 'napari.layers.Image':
@@ -69,3 +73,9 @@ def moving_ps(data_dir) -> 'Path':
     return image_generator(1, 51, 10, 60, pointset=True, ps_name='moving',
                                 data_dir=data_dir)
 
+
+@pytest.fixture(scope="function")
+def default_rigid() -> 'itk.ParameterObject':
+    default_rigid = itk.ParameterObject.New()
+    default_rigid.SetParameterMap(default_rigid.GetDefaultParameterMap('rigid'))
+    return default_rigid
