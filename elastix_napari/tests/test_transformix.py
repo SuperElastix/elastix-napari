@@ -6,7 +6,8 @@ from itk_napari_conversion import image_from_image_layer
 from qtpy.QtWidgets import QMessageBox
 from pathlib import Path
 
-def test_transformation(fixed_image, moving_image, default_rigid, tmpdir):
+def test_transformation(images, default_rigid, tmpdir):
+    fixed_image, moving_image = images
     result_image_elx, result_transform_parameters = itk.elastix_registration_method(image_from_image_layer(fixed_image),
                                                                                     image_from_image_layer(moving_image),
                                                                                     parameter_object=default_rigid,
@@ -27,8 +28,8 @@ def test_empty_image(data_dir):
     assert isinstance(result, QMessageBox)
 
 
-def test_empty_transform_file(moving_image):
-    result = transformix_widget.create_transformix_widget()(image=image_from_image_layer(moving_image), transform_file=Path())
+def test_empty_transform_file(images):
+    result = transformix_widget.create_transformix_widget()(image=image_from_image_layer(images[1]), transform_file=Path())
     assert isinstance(result, QMessageBox)
 
 
