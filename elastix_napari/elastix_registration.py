@@ -159,9 +159,9 @@ def elastix_registration(fixed_image: 'napari.layers.Image',
             parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
         parameter_object.AddParameterMap(parameter_map)
 
-    kwargs = {"fixed_image": fixed_image,
-              "moving_image": moving_image,
-              "parameter_object": parameter_object,
+    args = [fixed_image, moving_image]
+
+    kwargs = {"parameter_object": parameter_object,
               "fixed_point_set_file_name": str(fixed_ps),
               "moving_point_set_file_name": str(moving_ps),
               "initial_transform_parameter_file_name": str(init_trans),
@@ -189,7 +189,7 @@ def elastix_registration(fixed_image: 'napari.layers.Image',
 
 
     # Run elastix registration
-    result_image, result_transform_parameters = itk.elastix_registration_method(**kwargs)
+    result_image, result_transform_parameters = itk.elastix_registration_method(*args, **kwargs)
     
     # Convert result (itk.Image) to napari layer
     layer = image_layer_from_image(result_image)
