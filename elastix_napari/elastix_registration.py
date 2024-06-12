@@ -29,7 +29,7 @@ def error(message):
 
 
 def check_pointset(pointset):
-    if '.txt' in str(pointset[0]) or '.vtk' in str(pointset[0]):
+    if pointset and ('.txt' in str(pointset[0]) or '.vtk' in str(pointset[0])):
         return True
     else:
         return False
@@ -154,6 +154,8 @@ def elastix_registration(fixed: 'napari.types.ImageData',
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
         for par_sequence in [param1, param2, param3]:
+            if not par_sequence:
+                continue
             par = str(par_sequence[0])
             if ".txt" in par:
                 try:
