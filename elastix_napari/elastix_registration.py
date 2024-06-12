@@ -46,10 +46,10 @@ def on_init(widget):
 
     def toggle_mask_widgets(event):
         for x in ['fixed_mask', 'moving_mask']:
-            setattr(getattr(widget, x), 'visible', event.value)
+            setattr(getattr(widget, x), 'visible', event)
 
     def toggle_preset_widget(event):
-        if event.value == "custom":
+        if event == "custom":
             for x in ['param1', 'param2', 'param3']:
                 setattr(getattr(widget, x), 'visible', True)
             for y in ['metric', 'resolutions', 'max_iterations',
@@ -62,17 +62,17 @@ def on_init(widget):
             for x in ['metric', 'init_trans', 'resolutions', 'max_iterations',
                       'nr_spatial_samples', 'max_step_length', 'moving_ps',
                       'fixed_ps']:
-                setattr(getattr(widget, x), 'visible', widget.advanced.value)
+                setattr(getattr(widget, x), 'visible', widget.advanced)
 
     def toggle_advanced_widget(event):
         if widget.preset.value == "custom":
             for x in ['init_trans', 'fixed_ps', 'moving_ps']:
-                setattr(getattr(widget, x), 'visible', event.value)
+                setattr(getattr(widget, x), 'visible', event)
         else:
             for x in ['metric', 'init_trans', 'resolutions',
                       'max_iterations', 'nr_spatial_samples',
                       'max_step_length', 'fixed_ps', 'moving_ps']:
-                setattr(getattr(widget, x), 'visible', event.value)
+                setattr(getattr(widget, x), 'visible', event)
 
     widget.preset.changed.connect(toggle_preset_widget)
     widget.masks.changed.connect(toggle_mask_widgets)
