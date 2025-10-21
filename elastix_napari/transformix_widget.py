@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     import napari
 
 
-
 def on_init(widget):
     """
     Initializes widget layout.
@@ -19,29 +18,35 @@ def on_init(widget):
     """
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
 
-    setattr(getattr(widget, 'interpolation_order'), 'visible', False)
+    setattr(getattr(widget, "interpolation_order"), "visible", False)
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
-        setattr(getattr(widget, 'interpolation_order'), 'visible', value)
+        setattr(getattr(widget, "interpolation_order"), "visible", value)
 
     widget.native.layout().addStretch()
 
 
-@magic_factory(widget_init=on_init, layout='vertical', call_button='transform',
-               transform_file={"filter": "*.txt",
-                               "tooltip": "Load a transformation parameter file"},
-               interpolation_order={'min': 0, 'max': 5,
-                                    'tooltip': "Override interpolation order"})
-def create_transformix_widget(image: 'napari.layers.Image',
-                              transform_file: Path,
-                              interpolation_order: int = 3,
-                              advanced: bool = False
-                              ) -> 'napari.layers.Image':
-    
+@magic_factory(
+    widget_init=on_init,
+    layout="vertical",
+    call_button="transform",
+    transform_file={
+        "filter": "*.txt",
+        "tooltip": "Load a transformation parameter file",
+    },
+    interpolation_order={"min": 0, "max": 5, "tooltip": "Override interpolation order"},
+)
+def create_transformix_widget(
+    image: "napari.layers.Image",
+    transform_file: Path,
+    interpolation_order: int = 3,
+    advanced: bool = False,
+) -> "napari.layers.Image":
+
     if not image:
         return utils.error("No image selected for transformation")
-    
+
     if not utils.check_filename(transform_file):
         return utils.error("Select transformation parameter file")
 
@@ -55,8 +60,12 @@ def create_transformix_widget(image: 'napari.layers.Image',
 
     # Override interpolation order if 'advanced' is chosen
     if advanced:
-        transform_parameter_object.SetParameter(0, "ResampleInterpolator", "FinalBSplineInterpolator")
-        transform_parameter_object.SetParameter(0, "FinalBSplineInterpolationOrder", str(interpolation_order))
+        transform_parameter_object.SetParameter(
+            0, "ResampleInterpolator", "FinalBSplineInterpolator"
+        )
+        transform_parameter_object.SetParameter(
+            0, "FinalBSplineInterpolationOrder", str(interpolation_order)
+        )
 
     # Call transformix
     result_image_transformix = itk.transformix_filter(image, transform_parameter_object)
