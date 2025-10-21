@@ -7,7 +7,7 @@ from itk_napari_conversion import image_from_image_layer
 from itk_napari_conversion import image_layer_from_image
 
 # For IDE type support and autocompletion
-# https://napari.org/stable/guides/magicgui.html?highlight=type_checking
+# https://napari.org/stable/plugins/building_a_plugin/best_practices.html#don-t-require-napari-if-not-necessary
 if TYPE_CHECKING:
     import napari
 
