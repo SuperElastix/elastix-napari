@@ -22,18 +22,18 @@ def on_init(widget):
     for x in [
         "fixed_mask",
         "moving_mask",
-        "param1",
-        "param2",
-        "param3",
-        "fixed_ps",
-        "moving_ps",
+        "parameterfile_1",
+        "parameterfile_2",
+        "parameterfile_3",
+        "fixed_point_set",
+        "moving_point_set",
         "metric",
-        "init_trans",
+        "initial_transform",
         "resolutions",
         "max_iterations",
         "nr_spatial_samples",
         "max_step_length",
-        "output_dir",
+        "output_directory",
     ]:
         setattr(getattr(widget, x), "visible", False)
 
@@ -45,7 +45,7 @@ def on_init(widget):
     @widget.preset.changed.connect
     def toggle_preset_widget(value):
         if value == "custom":
-            for x in ["param1", "param2", "param3"]:
+            for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
                 setattr(getattr(widget, x), "visible", True)
             for y in [
                 "metric",
@@ -57,39 +57,39 @@ def on_init(widget):
                 setattr(getattr(widget, y), "visible", False)
 
         else:
-            for x in ["param1", "param2", "param3"]:
+            for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
                 setattr(getattr(widget, x), "visible", False)
             for x in [
                 "metric",
-                "init_trans",
+                "initial_transform",
                 "resolutions",
                 "max_iterations",
                 "nr_spatial_samples",
                 "max_step_length",
-                "moving_ps",
-                "fixed_ps",
+                "moving_point_set",
+                "fixed_point_set",
             ]:
                 setattr(getattr(widget, x), "visible", widget.advanced.value)
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
-        setattr(getattr(widget, "output_dir"), "visible", value)
+        setattr(getattr(widget, "output_directory"), "visible", value)
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
         if widget.preset.value == "custom":
-            for x in ["init_trans", "fixed_ps", "moving_ps"]:
+            for x in ["initial_transform", "fixed_point_set", "moving_point_set"]:
                 setattr(getattr(widget, x), "visible", value)
         else:
             for x in [
                 "metric",
-                "init_trans",
+                "initial_transform",
                 "resolutions",
                 "max_iterations",
                 "nr_spatial_samples",
                 "max_step_length",
-                "fixed_ps",
-                "moving_ps",
+                "fixed_point_set",
+                "moving_point_set",
             ]:
                 setattr(getattr(widget, x), "visible", value)
 
@@ -107,28 +107,23 @@ def on_init(widget):
     },
     fixed_mask={"bind": None},
     moving_mask={"bind": None},
-    fixed_ps={
-        "label": "fixed point set",
+    fixed_point_set={
         "filter": "*.txt",
         "tooltip": "Load a fixed point set",
     },
-    moving_ps={
-        "label": "moving point set",
+    moving_point_set={
         "filter": "*.txt",
         "tooltip": "Load a moving point set",
     },
-    param1={
-        "label": "parameterfile 1",
+    parameterfile_1={
         "filter": "*.txt",
         "tooltip": "Load a custom parameter file",
     },
-    param2={
-        "label": "parameterfile 2",
+    parameterfile_2={
         "filter": "*.txt",
         "tooltip": "Optionally load a second custom parameter " "file",
     },
-    param3={
-        "label": "parameterfile 3",
+    parameterfile_3={
         "filter": "*.txt",
         "tooltip": "Optionally load a third custom parameter " "file",
     },
@@ -140,13 +135,11 @@ def on_init(widget):
         ],
         "tooltip": "Select a metric to use",
     },
-    init_trans={
-        "label": "initial transform",
+    initial_transform={
         "filter": "*.txt",
         "tooltip": "Load a initial transform from a .txt " "file",
     },
-    output_dir={
-        "label": "output directory",
+    output_directory={
         "mode": "d",
         "tooltip": "Specify output directory to store the results",
     },
@@ -162,13 +155,13 @@ def elastix_registration(
     preset: str,
     fixed_mask: "napari.layers.Image",
     moving_mask: "napari.layers.Image",
-    fixed_ps: Path,
-    moving_ps: Path,
-    param1: Path,
-    param2: Path,
-    param3: Path,
-    init_trans: Path,
-    output_dir: Path,
+    fixed_point_set: Path,
+    moving_point_set: Path,
+    parameterfile_1: Path,
+    parameterfile_2: Path,
+    parameterfile_3: Path,
+    initial_transform: Path,
+    output_directory: Path,
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
     max_iterations: int = 500,
@@ -183,15 +176,15 @@ def elastix_registration(
     """
     if fixed_image is None or moving_image is None:
         return utils.error("No images selected for registration.")
-    if fixed_ps.exists() != moving_ps.exists():
+    if fixed_point_set.exists() != moving_point_set.exists():
         return utils.error("Select both fixed and moving point set.")
 
-    if not utils.check_filename(init_trans):
-        init_trans = ""
-    if not utils.check_filename(fixed_ps):
-        fixed_ps = ""
-    if not utils.check_filename(moving_ps):
-        moving_ps = ""
+    if not utils.check_filename(initial_transform):
+        initial_transform = ""
+    if not utils.check_filename(fixed_point_set):
+        fixed_point_set = ""
+    if not utils.check_filename(moving_point_set):
+        moving_point_set = ""
 
     # Convert image layer to itk_image
     fixed_image = image_from_image_layer(fixed_image)
@@ -201,7 +194,7 @@ def elastix_registration(
 
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
-        for par in [param1, param2, param3]:
+        for par in [parameterfile_1, parameterfile_2, parameterfile_3]:
             if par.suffix == ".txt":
                 try:
                     parameter_object.AddParameterFile(str(par))
@@ -213,7 +206,7 @@ def elastix_registration(
         if advanced:
             parameter_map = parameter_object.GetDefaultParameterMap(preset, resolutions)
             parameter_map["Metric"] = [metric]
-            if str(fixed_ps) != "" and str(moving_ps) != "":
+            if str(fixed_point_set) != "" and str(moving_point_set) != "":
                 parameter_map["Registration"] = [
                     "MultiMetricMultiResolutionRegistration"
                 ]
@@ -233,9 +226,9 @@ def elastix_registration(
 
     kwargs = {
         "parameter_object": parameter_object,
-        "fixed_point_set_file_name": str(fixed_ps),
-        "moving_point_set_file_name": str(moving_ps),
-        "initial_transform_parameter_file_name": str(init_trans),
+        "fixed_point_set_file_name": str(fixed_point_set),
+        "moving_point_set_file_name": str(moving_point_set),
+        "initial_transform_parameter_file_name": str(initial_transform),
         "log_to_console": True,
     }
 
@@ -254,10 +247,10 @@ def elastix_registration(
                 kwargs["moving_mask"] = moving_mask
 
     if save_output:
-        if not output_dir.is_dir() or output_dir == Path():
+        if not output_directory.is_dir() or output_directory == Path():
             return utils.error("Output directory is not chosen/valid")
 
-        kwargs["output_directory"] = str(output_dir)
+        kwargs["output_directory"] = str(output_directory)
 
     # Run elastix registration
     result_image, result_transform_parameters = itk.elastix_registration_method(
