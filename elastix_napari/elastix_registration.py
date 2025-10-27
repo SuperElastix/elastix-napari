@@ -153,6 +153,7 @@ def elastix_registration(
     fixed_image: "napari.layers.Image",
     moving_image: "napari.layers.Image",
     preset: str,
+    masks: bool,
     fixed_mask: "napari.layers.Image",
     moving_mask: "napari.layers.Image",
     fixed_point_set: Path,
@@ -161,14 +162,13 @@ def elastix_registration(
     parameterfile_2: Path,
     parameterfile_3: Path,
     initial_transform: Path,
+    save_output: bool,
     output_directory: Path,
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
     max_iterations: int = 500,
     nr_spatial_samples: int = 512,
     max_step_length: float = 1.0,
-    masks: bool = False,
-    save_output: bool = False,
     advanced: bool = False,
 ) -> "napari.layers.Image":
     """
