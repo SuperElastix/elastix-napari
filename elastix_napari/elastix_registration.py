@@ -103,7 +103,7 @@ def on_init(widget):
     layout="vertical",
     call_button="register",
     preset={
-        "choices": ["rigid", "affine", "bspline", "custom"],
+        "choices": ["translation", "rigid", "affine", "bspline", "custom"],
         "tooltip": "Select a preset parameter file or select "
         "the 'custom' option to load a custom one",
     },
