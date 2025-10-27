@@ -33,6 +33,7 @@ def on_init(widget):
         "max_iterations",
         "nr_spatial_samples",
         "max_step_length",
+        "log_to_file",
         "output_directory",
     ]:
         setattr(getattr(widget, x), "visible", False)
@@ -73,6 +74,7 @@ def on_init(widget):
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
+        setattr(getattr(widget, "log_to_file"), "visible", value)
         setattr(getattr(widget, "output_directory"), "visible", value)
 
     @widget.advanced.changed.connect
@@ -163,6 +165,7 @@ def elastix_registration(
     parameterfile_3: Path,
     initial_transform: Path,
     save_output: bool,
+    log_to_file: bool,
     output_directory: Path,
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
@@ -250,6 +253,7 @@ def elastix_registration(
         if not output_directory.is_dir() or output_directory == Path():
             return utils.error("Output directory is not chosen/valid")
 
+        kwargs["log_to_file"] = log_to_file
         kwargs["output_directory"] = str(output_directory)
 
     # Run elastix registration
