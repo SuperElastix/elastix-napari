@@ -36,18 +36,18 @@ def on_init(widget):
         "log_to_file",
         "output_directory",
     ]:
-        setattr(getattr(widget, x), "visible", False)
+        getattr(widget, x).visible = False
 
     @widget.masks.changed.connect
     def toggle_mask_widgets(value):
         for x in ["fixed_mask", "moving_mask"]:
-            setattr(getattr(widget, x), "visible", value)
+            getattr(widget, x).visible = value
 
     @widget.preset.changed.connect
     def toggle_preset_widget(value):
         if value == "custom":
             for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
-                setattr(getattr(widget, x), "visible", True)
+                getattr(widget, x).visible = True
             for y in [
                 "metric",
                 "resolutions",
@@ -55,11 +55,11 @@ def on_init(widget):
                 "nr_spatial_samples",
                 "max_step_length",
             ]:
-                setattr(getattr(widget, y), "visible", False)
+                getattr(widget, y).visible = False
 
         else:
             for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
-                setattr(getattr(widget, x), "visible", False)
+                getattr(widget, x).visible = False
             for x in [
                 "metric",
                 "initial_transform",
@@ -70,18 +70,18 @@ def on_init(widget):
                 "moving_point_set",
                 "fixed_point_set",
             ]:
-                setattr(getattr(widget, x), "visible", widget.advanced.value)
+                getattr(widget, x).visible = widget.advanced.value
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
-        setattr(getattr(widget, "log_to_file"), "visible", value)
-        setattr(getattr(widget, "output_directory"), "visible", value)
+        getattr(widget, "log_to_file").visible = value
+        getattr(widget, "output_directory").visible = value
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
         if widget.preset.value == "custom":
             for x in ["initial_transform", "fixed_point_set", "moving_point_set"]:
-                setattr(getattr(widget, x), "visible", value)
+                getattr(widget, x).visible = value
         else:
             for x in [
                 "metric",
@@ -93,7 +93,7 @@ def on_init(widget):
                 "fixed_point_set",
                 "moving_point_set",
             ]:
-                setattr(getattr(widget, x), "visible", value)
+                getattr(widget, x).visible = value
 
     widget.native.layout().addStretch()
 
