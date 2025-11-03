@@ -40,8 +40,8 @@ def on_init(widget):
 def create_transformix_widget(
     image: "napari.layers.Image",
     transform_file: Path,
-    interpolation_order: int = 3,
     advanced: bool = False,
+    interpolation_order: int = 3,
 ) -> "napari.layers.Image":
 
     if not image:
