@@ -39,12 +39,12 @@ def on_init(widget):
         getattr(widget, name).visible = False
 
     @widget.masks.changed.connect
-    def toggle_mask_widgets(value):
+    def on_masks_changed(value):
         for name in ["fixed_mask", "moving_mask"]:
             getattr(widget, name).visible = value
 
     @widget.preset.changed.connect
-    def toggle_preset_widget(value):
+    def on_preset_changed(value):
         is_custom_preset = value == "custom"
 
         for name in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
@@ -61,12 +61,12 @@ def on_init(widget):
             )
 
     @widget.save_output.changed.connect
-    def toggle_save_output_widget(value):
+    def on_save_output_changed(value):
         widget.log_to_file.visible = value
         widget.output_directory.visible = value
 
     @widget.use_corresponding_points.changed.connect
-    def toggle_use_corresponding_points_widget(value):
+    def on_use_corresponding_points_changed(value):
         for name in [
             "fixed_point_set",
             "moving_point_set",
@@ -74,7 +74,7 @@ def on_init(widget):
             getattr(widget, name).visible = value
 
     @widget.advanced.changed.connect
-    def toggle_advanced_widget(value):
+    def on_advanced_changed(value):
         widget.initial_transform.visible = value
 
         if widget.preset.value != "custom":

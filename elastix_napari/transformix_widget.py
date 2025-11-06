@@ -21,7 +21,7 @@ def on_init(widget):
     widget.interpolation_order.visible = False
 
     @widget.advanced.changed.connect
-    def toggle_advanced_widget(value):
+    def on_advanced_changed(value):
         widget.interpolation_order.visible = value
 
     widget.native.layout().addStretch()
