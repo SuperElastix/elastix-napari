@@ -19,7 +19,7 @@ def on_init(widget):
     """
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
 
-    for x in [
+    for name in [
         "fixed_mask",
         "moving_mask",
         "parameterfile_1",
@@ -36,27 +36,29 @@ def on_init(widget):
         "log_to_file",
         "output_directory",
     ]:
-        getattr(widget, x).visible = False
+        getattr(widget, name).visible = False
 
     @widget.masks.changed.connect
     def toggle_mask_widgets(value):
-        for x in ["fixed_mask", "moving_mask"]:
-            getattr(widget, x).visible = value
+        for name in ["fixed_mask", "moving_mask"]:
+            getattr(widget, name).visible = value
 
     @widget.preset.changed.connect
     def toggle_preset_widget(value):
         is_custom_preset = value == "custom"
 
-        for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
-            getattr(widget, x).visible = is_custom_preset
-        for x in [
+        for name in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
+            getattr(widget, name).visible = is_custom_preset
+        for name in [
             "metric",
             "resolutions",
             "max_iterations",
             "nr_spatial_samples",
             "max_step_length",
         ]:
-            getattr(widget, x).visible = widget.advanced.value and not is_custom_preset
+            getattr(widget, name).visible = (
+                widget.advanced.value and not is_custom_preset
+            )
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
@@ -65,25 +67,25 @@ def on_init(widget):
 
     @widget.use_corresponding_points.changed.connect
     def toggle_use_corresponding_points_widget(value):
-        for x in [
+        for name in [
             "fixed_point_set",
             "moving_point_set",
         ]:
-            getattr(widget, x).visible = value
+            getattr(widget, name).visible = value
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
         widget.initial_transform.visible = value
 
         if widget.preset.value != "custom":
-            for x in [
+            for name in [
                 "metric",
                 "resolutions",
                 "max_iterations",
                 "nr_spatial_samples",
                 "max_step_length",
             ]:
-                getattr(widget, x).visible = value
+                getattr(widget, name).visible = value
 
     widget.native.layout().addStretch()
 
