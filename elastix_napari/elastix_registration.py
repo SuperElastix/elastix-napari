@@ -62,8 +62,8 @@ def on_init(widget):
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
-        getattr(widget, "log_to_file").visible = value
-        getattr(widget, "output_directory").visible = value
+        widget.log_to_file.visible = value
+        widget.output_directory.visible = value
 
     @widget.use_corresponding_points.changed.connect
     def toggle_use_corresponding_points_widget(value):

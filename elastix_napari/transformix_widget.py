@@ -18,11 +18,11 @@ def on_init(widget):
     """
     widget.native.setStyleSheet("QWidget{font-size: 12pt;}")
 
-    getattr(widget, "interpolation_order").visible = False
+    widget.interpolation_order.visible = False
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
-        getattr(widget, "interpolation_order").visible = value
+        widget.interpolation_order.visible = value
 
     widget.native.layout().addStretch()
 
