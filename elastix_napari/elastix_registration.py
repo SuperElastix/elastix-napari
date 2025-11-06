@@ -67,8 +67,6 @@ def on_init(widget):
                 "max_iterations",
                 "nr_spatial_samples",
                 "max_step_length",
-                "moving_point_set",
-                "fixed_point_set",
             ]:
                 getattr(widget, x).visible = widget.advanced.value
 
@@ -77,11 +75,18 @@ def on_init(widget):
         getattr(widget, "log_to_file").visible = value
         getattr(widget, "output_directory").visible = value
 
+    @widget.use_corresponding_points.changed.connect
+    def toggle_use_corresponding_points_widget(value):
+        for x in [
+            "fixed_point_set",
+            "moving_point_set",
+        ]:
+            getattr(widget, x).visible = value
+
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
         if widget.preset.value == "custom":
-            for x in ["initial_transform", "fixed_point_set", "moving_point_set"]:
-                getattr(widget, x).visible = value
+            getattr(widget, "initial_transform").visible = value
         else:
             for x in [
                 "metric",
@@ -90,8 +95,6 @@ def on_init(widget):
                 "max_iterations",
                 "nr_spatial_samples",
                 "max_step_length",
-                "fixed_point_set",
-                "moving_point_set",
             ]:
                 getattr(widget, x).visible = value
 
@@ -164,9 +167,10 @@ def elastix_registration(
     save_output: bool,
     log_to_file: bool,
     output_directory: Path,
-    advanced: bool,
+    use_corresponding_points: bool,
     fixed_point_set: Path,
     moving_point_set: Path,
+    advanced: bool,
     initial_transform: Path,
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
@@ -209,20 +213,19 @@ def elastix_registration(
         if advanced:
             parameter_map = parameter_object.GetDefaultParameterMap(preset, resolutions)
             parameter_map["Metric"] = [metric]
-            if str(fixed_point_set) != "" and str(moving_point_set) != "":
-                parameter_map["Registration"] = [
-                    "MultiMetricMultiResolutionRegistration"
-                ]
-                original_metric = parameter_map["Metric"]
-                parameter_map["Metric"] = [
-                    original_metric[0],
-                    "CorrespondingPointsEuclideanDistanceMetric",
-                ]
             parameter_map["MaximumStepLength"] = [str(max_step_length)]
             parameter_map["NumberOfSpatialSamples"] = [str(nr_spatial_samples)]
             parameter_map["MaximumNumberOfIterations"] = [str(max_iterations)]
         else:
             parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
+
+        if use_corresponding_points:
+            if str(fixed_point_set) == "" or str(moving_point_set) == "":
+                return utils.error("Please specify both point sets!")
+
+            parameter_map["Registration"] = ["MultiMetricMultiResolutionRegistration"]
+            parameter_map["Metric"] += ("CorrespondingPointsEuclideanDistanceMetric",)
+
         parameter_object.AddParameterMap(parameter_map)
 
     args = [fixed_image, moving_image]

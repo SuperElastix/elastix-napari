@@ -78,6 +78,7 @@ def test_pointset_registration(images, pointsets, default_rigid):
         fixed_point_set=fixed_point_set,
         moving_point_set=moving_point_set,
         preset="rigid",
+        use_corresponding_points=True,
         advanced=True,
     )
     default_rigid.SetParameter(
