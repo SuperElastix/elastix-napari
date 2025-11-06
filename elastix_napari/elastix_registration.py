@@ -45,30 +45,18 @@ def on_init(widget):
 
     @widget.preset.changed.connect
     def toggle_preset_widget(value):
-        if value == "custom":
-            for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
-                getattr(widget, x).visible = True
-            for y in [
-                "metric",
-                "resolutions",
-                "max_iterations",
-                "nr_spatial_samples",
-                "max_step_length",
-            ]:
-                getattr(widget, y).visible = False
+        is_custom_preset = value == "custom"
 
-        else:
-            for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
-                getattr(widget, x).visible = False
-            for x in [
-                "metric",
-                "initial_transform",
-                "resolutions",
-                "max_iterations",
-                "nr_spatial_samples",
-                "max_step_length",
-            ]:
-                getattr(widget, x).visible = widget.advanced.value
+        for x in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
+            getattr(widget, x).visible = is_custom_preset
+        for x in [
+            "metric",
+            "resolutions",
+            "max_iterations",
+            "nr_spatial_samples",
+            "max_step_length",
+        ]:
+            getattr(widget, x).visible = widget.advanced.value and not is_custom_preset
 
     @widget.save_output.changed.connect
     def toggle_save_output_widget(value):
@@ -85,12 +73,11 @@ def on_init(widget):
 
     @widget.advanced.changed.connect
     def toggle_advanced_widget(value):
-        if widget.preset.value == "custom":
-            getattr(widget, "initial_transform").visible = value
-        else:
+        widget.initial_transform.visible = value
+
+        if widget.preset.value != "custom":
             for x in [
                 "metric",
-                "initial_transform",
                 "resolutions",
                 "max_iterations",
                 "nr_spatial_samples",
