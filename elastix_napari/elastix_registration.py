@@ -31,7 +31,7 @@ def on_init(widget):
         "initial_transform",
         "resolutions",
         "max_iterations",
-        "nr_spatial_samples",
+        "spatial_samples",
         "max_step_length",
         "log_to_file",
         "output_directory",
@@ -53,7 +53,7 @@ def on_init(widget):
             "metric",
             "resolutions",
             "max_iterations",
-            "nr_spatial_samples",
+            "spatial_samples",
             "max_step_length",
         ]:
             getattr(widget, name).visible = (
@@ -82,7 +82,7 @@ def on_init(widget):
                 "metric",
                 "resolutions",
                 "max_iterations",
-                "nr_spatial_samples",
+                "spatial_samples",
                 "max_step_length",
             ]:
                 getattr(widget, name).visible = value
@@ -137,7 +137,7 @@ def on_init(widget):
         "mode": "d",
         "tooltip": "Specify output directory to store the results",
     },
-    nr_spatial_samples={
+    spatial_samples={
         "max": 8192,
         "step": 256,
         "tooltip": "Select the number of spatial " "samples to use",
@@ -164,7 +164,7 @@ def elastix_registration(
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
     max_iterations: int = 500,
-    nr_spatial_samples: int = 512,
+    spatial_samples: int = 512,
     max_step_length: float = 1.0,
 ) -> "napari.layers.Image":
     """
@@ -203,7 +203,7 @@ def elastix_registration(
             parameter_map = parameter_object.GetDefaultParameterMap(preset, resolutions)
             parameter_map["Metric"] = [metric]
             parameter_map["MaximumStepLength"] = [str(max_step_length)]
-            parameter_map["NumberOfSpatialSamples"] = [str(nr_spatial_samples)]
+            parameter_map["NumberOfSpatialSamples"] = [str(spatial_samples)]
             parameter_map["MaximumNumberOfIterations"] = [str(max_iterations)]
         else:
             parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
