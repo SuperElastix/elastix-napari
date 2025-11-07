@@ -38,8 +38,8 @@ def on_init(widget):
     ]:
         getattr(widget, name).visible = False
 
-    @widget.masks.changed.connect
-    def on_masks_changed(value):
+    @widget.use_masks.changed.connect
+    def on_use_masks_changed(value):
         for name in ["fixed_mask", "moving_mask"]:
             getattr(widget, name).visible = value
 
@@ -147,7 +147,7 @@ def elastix_registration(
     fixed_image: "napari.layers.Image",
     moving_image: "napari.layers.Image",
     preset: str,
-    masks: bool,
+    use_masks: bool,
     fixed_mask: "napari.layers.Image",
     moving_mask: "napari.layers.Image",
     parameterfile_1: Path,
@@ -227,7 +227,7 @@ def elastix_registration(
         "log_to_console": True,
     }
 
-    if masks:
+    if use_masks:
         if fixed_mask is None and moving_mask is None:
             return utils.error("No masks selected for registration")
         else:

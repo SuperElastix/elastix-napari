@@ -54,7 +54,7 @@ def test_masked_registration(images, masks, default_rigid):
         fixed_mask=fixed_mask,
         moving_mask=moving_mask,
         preset="rigid",
-        masks=True,
+        use_masks=True,
     )
     reference_result_image, _ = itk.elastix_registration_method(
         image_from_image_layer(fixed_image),
@@ -179,7 +179,7 @@ def test_empty_masks(images):
         fixed_mask=None,
         moving_mask=None,
         preset="rigid",
-        masks=True,
+        use_masks=True,
     )
     assert isinstance(im, QMessageBox)
 
