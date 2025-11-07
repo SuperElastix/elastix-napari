@@ -38,8 +38,8 @@ def on_init(widget):
     interpolation_order={"min": 0, "max": 5, "tooltip": "Override interpolation order"},
 )
 def create_transformix_widget(
-    image: "napari.layers.Image",
-    transform_file: Path,
+    image: "napari.layers.Image" = None,
+    transform_file: Path = "",
     advanced: bool = False,
     interpolation_order: int = 3,
 ) -> "napari.layers.Image":
