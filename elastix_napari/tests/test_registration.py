@@ -186,7 +186,7 @@ def test_empty_masks(images):
 
 def test_empty_output_directory(images):
     fixed_image, moving_image = images
-    im = get_er(fixed_image, moving_image, preset="rigid", save_output=True)
+    im = get_er(fixed_image, moving_image, preset="rigid", save_output_to_disk=True)
     assert isinstance(im, QMessageBox)
 
 
@@ -197,7 +197,7 @@ def test_writing_result(images, tmpdir):
         fixed_image,
         moving_image,
         preset="rigid",
-        save_output=True,
+        save_output_to_disk=True,
         output_directory=tmpdir,
     )
     assert (tmpdir / "TransformParameters.0.txt").exists()
