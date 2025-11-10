@@ -60,7 +60,7 @@ def on_init(widget):
                 widget.advanced.value and not is_custom_preset
             )
 
-    @widget.save_output.changed.connect
+    @widget.save_output_to_disk.changed.connect
     def on_save_output_changed(value):
         widget.log_to_file.visible = value
         widget.output_directory.visible = value
@@ -151,7 +151,7 @@ def elastix_registration(
     parameterfile_1: Path = "",
     parameterfile_2: Path = "",
     parameterfile_3: Path = "",
-    save_output: bool = False,
+    save_output_to_disk: bool = False,
     log_to_file: bool = False,
     output_directory: Path = "",
     use_corresponding_points: bool = False,
@@ -239,7 +239,7 @@ def elastix_registration(
                 moving_mask = moving_mask.astype(itk.UC)
                 kwargs["moving_mask"] = moving_mask
 
-    if save_output:
+    if save_output_to_disk:
         if not output_directory.is_dir() or output_directory == Path():
             return utils.error("Output directory is not chosen/valid")
 
