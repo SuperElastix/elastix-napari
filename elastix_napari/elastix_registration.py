@@ -144,7 +144,7 @@ def on_init(widget):
 def elastix_registration(
     fixed_image: "napari.layers.Image" = None,
     moving_image: "napari.layers.Image" = None,
-    preset: str = "translation",
+    preset: str = "rigid",
     use_masks: bool = False,
     fixed_mask: "napari.layers.Image" = None,
     moving_mask: "napari.layers.Image" = None,
