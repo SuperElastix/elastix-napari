@@ -28,7 +28,6 @@ def on_init(widget):
         "fixed_point_set",
         "moving_point_set",
         "metric",
-        "initial_transform",
         "resolutions",
         "max_iterations",
         "spatial_samples",
@@ -46,6 +45,7 @@ def on_init(widget):
     @widget.preset.changed.connect
     def on_preset_changed(value):
         is_custom_preset = value == "custom"
+        widget.advanced.visible = not is_custom_preset
 
         for name in ["parameterfile_1", "parameterfile_2", "parameterfile_3"]:
             getattr(widget, name).visible = is_custom_preset
@@ -75,8 +75,6 @@ def on_init(widget):
 
     @widget.advanced.changed.connect
     def on_advanced_changed(value):
-        widget.initial_transform.visible = value
-
         if widget.preset.value != "custom":
             for name in [
                 "metric",
@@ -159,8 +157,8 @@ def elastix_registration(
     use_corresponding_points: bool = False,
     fixed_point_set: Path = "",
     moving_point_set: Path = "",
-    advanced: bool = False,
     initial_transform: Path = "",
+    advanced: bool = False,
     metric: str = "AdvancedMattesMutualInformation",
     resolutions: int = 4,
     max_iterations: int = 500,
