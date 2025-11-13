@@ -32,7 +32,7 @@ def on_init(widget):
     layout="vertical",
     call_button="transform",
     transform_file={
-        "filter": "*.txt",
+        "filter": "*.txt;*.toml",
         "tooltip": "Load a transformation parameter file",
     },
     interpolation_order={"min": 0, "max": 5, "tooltip": "Override interpolation order"},
@@ -47,7 +47,7 @@ def create_transformix_widget(
     if not image:
         return utils.error("No image selected for transformation")
 
-    if not utils.check_filename(transform_file):
+    if transform_file == Path():
         return utils.error("Select transformation parameter file")
 
     # Convert image layer to itk image
