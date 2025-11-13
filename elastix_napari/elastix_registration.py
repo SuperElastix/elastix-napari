@@ -12,6 +12,13 @@ if TYPE_CHECKING:
     import napari
 
 
+def convert_file_path_to_string(file_path: Path) -> str:
+    """
+    Works around the problem that `str(file_path)` returns "." when the Path object is empty.
+    """
+    return "" if file_path == Path() else str(file_path)
+
+
 def on_init(widget):
     """
     Initializes widget layout.
@@ -108,15 +115,15 @@ def on_init(widget):
         "tooltip": "Load a moving point set",
     },
     parameterfile_1={
-        "filter": "*.txt",
+        "filter": "*.txt;*.toml",
         "tooltip": "Load a custom parameter file",
     },
     parameterfile_2={
-        "filter": "*.txt",
+        "filter": "*.txt;*.toml",
         "tooltip": "Optionally load a second custom parameter " "file",
     },
     parameterfile_3={
-        "filter": "*.txt",
+        "filter": "*.txt;*.toml",
         "tooltip": "Optionally load a third custom parameter " "file",
     },
     metric={
@@ -128,8 +135,8 @@ def on_init(widget):
         "tooltip": "Select a metric to use",
     },
     initial_transform={
-        "filter": "*.txt",
-        "tooltip": "Load a initial transform from a .txt " "file",
+        "filter": "*.txt;*.toml",
+        "tooltip": "Load a initial transform from a .txt or TOML file",
     },
     output_directory={
         "mode": "d",
@@ -173,8 +180,6 @@ def elastix_registration(
     if fixed_point_set.exists() != moving_point_set.exists():
         return utils.error("Select both fixed and moving point set.")
 
-    if not utils.check_filename(initial_transform):
-        initial_transform = ""
     if not utils.check_filename(fixed_point_set):
         fixed_point_set = ""
     if not utils.check_filename(moving_point_set):
@@ -188,10 +193,10 @@ def elastix_registration(
 
     parameter_object = itk.ParameterObject.New()
     if preset == "custom":
-        for par in [parameterfile_1, parameterfile_2, parameterfile_3]:
-            if par.suffix == ".txt":
+        for file_path in [parameterfile_1, parameterfile_2, parameterfile_3]:
+            if file_path != Path():
                 try:
-                    parameter_object.AddParameterFile(str(par))
+                    parameter_object.AddParameterFile(str(file_path))
                 except:
                     return utils.error("Parameter file not found or not valid")
             else:
@@ -221,7 +226,9 @@ def elastix_registration(
         "parameter_object": parameter_object,
         "fixed_point_set_file_name": str(fixed_point_set),
         "moving_point_set_file_name": str(moving_point_set),
-        "initial_transform_parameter_file_name": str(initial_transform),
+        "initial_transform_parameter_file_name": convert_file_path_to_string(
+            initial_transform
+        ),
         "log_to_console": True,
     }
 
