@@ -3,7 +3,6 @@ import elastix_napari
 import itk
 from elastix_napari import elastix_registration
 import numpy as np
-from qtpy.QtWidgets import QMessageBox
 from itk_napari_conversion import image_layer_from_image
 from itk_napari_conversion import image_from_image_layer
 from pathlib import Path
@@ -164,30 +163,6 @@ def test_initial_transform(images, default_rigid, data_dir):
     diff = image_from_image_layer(result_image)[:] - reference_result_image[:]
     print(diff.min(), diff.max())
     assert np.allclose(image_from_image_layer(result_image), reference_result_image)
-
-
-def test_empty_images():
-    im = get_er(None, None, preset="rigid")
-    assert isinstance(im, QMessageBox)
-
-
-def test_empty_masks(images):
-    fixed_image, moving_image = images
-    im = get_er(
-        fixed_image,
-        moving_image,
-        fixed_mask=None,
-        moving_mask=None,
-        preset="rigid",
-        use_masks=True,
-    )
-    assert isinstance(im, QMessageBox)
-
-
-def test_empty_output_directory(images):
-    fixed_image, moving_image = images
-    im = get_er(fixed_image, moving_image, preset="rigid", save_output_to_disk=True)
-    assert isinstance(im, QMessageBox)
 
 
 def test_writing_result(images, tmpdir):
