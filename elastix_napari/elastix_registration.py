@@ -180,11 +180,6 @@ def elastix_registration(
     if fixed_point_set.exists() != moving_point_set.exists():
         return utils.error("Select both fixed and moving point set.")
 
-    if not utils.check_filename(fixed_point_set):
-        fixed_point_set = ""
-    if not utils.check_filename(moving_point_set):
-        moving_point_set = ""
-
     # Convert image layer to itk_image
     fixed_image = image_from_image_layer(fixed_image)
     moving_image = image_from_image_layer(moving_image)
@@ -212,7 +207,7 @@ def elastix_registration(
             parameter_map = parameter_object.GetDefaultParameterMap(preset, 4)
 
         if use_corresponding_points:
-            if str(fixed_point_set) == "" or str(moving_point_set) == "":
+            if fixed_point_set == Path() or moving_point_set == Path():
                 return utils.error("Please specify both point sets!")
 
             parameter_map["Registration"] = ["MultiMetricMultiResolutionRegistration"]
