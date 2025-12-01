@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-import elastix_napari.utils as utils
 from magicgui import magic_factory
 import itk
 from pathlib import Path
@@ -11,6 +10,7 @@ from itk_napari_conversion import image_layer_from_image
 if TYPE_CHECKING:
     import napari
 
+from napari.utils import notifications
 
 def convert_file_path_to_string(file_path: Path) -> str:
     """
@@ -176,9 +176,11 @@ def elastix_registration(
     Takes user input and calls elastix' registration function in itkelastix.
     """
     if fixed_image is None or moving_image is None:
-        return utils.error("No images selected for registration.")
+        notifications.show_error("No images selected for registration.")
+        return None
     if fixed_point_set.exists() != moving_point_set.exists():
-        return utils.error("Select both fixed and moving point set.")
+        notifications.show_error("Select both fixed and moving point set.")
+        return None
 
     # Convert image layer to itk_image
     fixed_image = image_from_image_layer(fixed_image)
@@ -193,7 +195,8 @@ def elastix_registration(
                 try:
                     parameter_object.AddParameterFile(str(file_path))
                 except:
-                    return utils.error("Parameter file not found or not valid")
+                    notifications.show_error("Parameter file not found or not valid")
+                    return None
             else:
                 pass
     else:
@@ -208,7 +211,8 @@ def elastix_registration(
 
         if use_corresponding_points:
             if fixed_point_set == Path() or moving_point_set == Path():
-                return utils.error("Please specify both point sets!")
+                notifications.show_error("Please specify both point sets!")
+                return None
 
             parameter_map["Registration"] = ["MultiMetricMultiResolutionRegistration"]
             parameter_map["Metric"] += ("CorrespondingPointsEuclideanDistanceMetric",)
@@ -229,7 +233,8 @@ def elastix_registration(
 
     if use_masks:
         if fixed_mask is None and moving_mask is None:
-            return utils.error("No masks selected for registration")
+            notifications.show_error("No masks selected for registration")
+            return None
         else:
             if fixed_mask:
                 fixed_mask = image_from_image_layer(fixed_mask)
@@ -243,7 +248,8 @@ def elastix_registration(
 
     if save_output_to_disk:
         if not output_directory.is_dir() or output_directory == Path():
-            return utils.error("Output directory is not chosen/valid")
+            notifications.show_error("Output directory is not chosen/valid")
+            return None
 
         kwargs["log_to_file"] = log_to_file
         kwargs["output_directory"] = str(output_directory)
