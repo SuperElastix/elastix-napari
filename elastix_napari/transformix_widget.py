@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-import elastix_napari.utils as utils
 from magicgui import magic_factory
 import itk
 from itk_napari_conversion import image_from_image_layer, image_layer_from_image
@@ -10,6 +9,7 @@ from pathlib import Path
 if TYPE_CHECKING:
     import napari
 
+from napari.utils import notifications
 
 def on_init(widget):
     """
@@ -45,10 +45,12 @@ def create_transformix_widget(
 ) -> "napari.layers.Image":
 
     if not image:
-        return utils.error("No image selected for transformation")
+        notifications.show_error("No image selected for transformation")
+        return None
 
     if transform_file == Path():
-        return utils.error("Select transformation parameter file")
+        notifications.show_error("Select transformation parameter file")
+        return None
 
     # Convert image layer to itk image
     image = image_from_image_layer(image)
