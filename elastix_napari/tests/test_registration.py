@@ -165,6 +165,28 @@ def test_initial_transform(images, default_rigid, data_dir):
     assert np.allclose(image_from_image_layer(result_image), reference_result_image)
 
 
+def test_empty_images():
+    im = get_er(None, None, preset="rigid")
+    assert im is None
+
+
+def test_empty_masks(images):
+    fixed_image, moving_image = images
+    im = get_er(
+        fixed_image,
+        moving_image,
+        fixed_mask=None,
+        moving_mask=None,
+        preset="rigid",
+        use_masks=True,
+    )
+    assert im is None
+
+def test_empty_output_directory(images):
+    fixed_image, moving_image = images
+    im = get_er(fixed_image, moving_image, preset="rigid", save_output_to_disk=True)
+    assert im is None
+
 def test_writing_result(images, tmpdir):
     fixed_image, moving_image = images
     tmpdir = Path(tmpdir)
