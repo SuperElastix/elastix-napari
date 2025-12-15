@@ -1,7 +1,7 @@
-__author__ = "Viktor van der Valk"
-__email__ = "v.o.van_der_valk@lumc.nl"
+__author__ = "Niels Dekker"
+__email__ = "N.Dekker@lumc.nl"
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 
 
 def get_module_version():
