@@ -1,4 +1,4 @@
-itk-elastix>=0.11.1
+itk-elastix>=0.24.0
 numpy>=1.19.0
 napari[all]>=0.4.6
 napari-plugin-engine>=0.1.4
